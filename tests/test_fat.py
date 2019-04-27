@@ -1,5 +1,6 @@
+import vcr
 from pytest import fixture
-from fat import FAT
+from fat.client import Fat
 
 
 class TestFat:
@@ -14,7 +15,7 @@ class TestFat:
 
     @fixture
     def fat_instance(self):
-        return FAT("http://localhost:8078/v1")
+        return Fat("http://localhost:8078/v1")
 
     @fixture
     def get_issuance_subkeys(self):
@@ -25,6 +26,7 @@ class TestFat:
     def get_transaction_subkeys(self):
         return ["entryhash", "timestamp", "data"]
 
+    @vcr.use_cassette("tests/vcr_cassettes/get_issuance.yaml")
     def test_get_issuance_by_chain(self, fat_instance, get_issuance_subkeys):
         """Tests an API call to get a token's issuance."""
 
@@ -35,6 +37,7 @@ class TestFat:
         assert response["result"]["chainid"] == self.chain_id
         assert set(get_issuance_subkeys).issubset(response["result"])
 
+    @vcr.use_cassette("tests/vcr_cassettes/get_issuance.yaml")
     def test_get_issuance_by_token(self, fat_instance, get_issuance_subkeys):
         """Tests an API call to get a token's issuance."""
 
@@ -47,6 +50,7 @@ class TestFat:
         assert response["result"]["issuerid"] == self.issuer_id
         assert set(get_issuance_subkeys).issubset(response["result"])
 
+    @vcr.use_cassette("tests/vcr_cassettes/get_transaction.yaml")
     def test_get_transaction(self, fat_instance, get_transaction_subkeys):
 
         response = fat_instance.get_transaction(self.entry_hash, self.chain_id)

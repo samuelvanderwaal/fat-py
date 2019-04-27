@@ -1,0 +1,41 @@
+interactions:
+- request:
+    body: '{"jsonrpc": "2.0", "method": "get-issuance", "params": {"chainid": "b54c4310530dc4dd361101644fa55cb10aec561e7874a7b786ea3b66f2c6fdfb"},
+      "id": 1}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '144'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.21.0
+    method: POST
+    uri: http://localhost:8078/v1
+  response:
+    body:
+      string: '{"jsonrpc":"2.0","result":{"chainid":"b54c4310530dc4dd361101644fa55cb10aec561e7874a7b786ea3b66f2c6fdfb","tokenid":"test","issuerid":"88888807e4f3bbb9a2b229645ab6d2f184224190f83e78761674c2362aca4425","entryhash":"9896bcbe9b0eab7cea7faaa7ff4a33c9536304817525750c3bedc7bffc1632c8","timestamp":1545943560,"issuance":{"type":"FAT-0","supply":100000}},"id":1}
+
+        '
+    headers:
+      Content-Length:
+      - '354'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Sat, 27 Apr 2019 19:56:36 GMT
+      Fatd-Api-Version:
+      - '1'
+      Fatd-Version:
+      - v0.4.2.r9.g8cf68b7
+      Vary:
+      - Origin
+    status:
+      code: 200
+      message: OK
+version: 1
