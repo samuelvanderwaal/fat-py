@@ -1,6 +1,6 @@
 import vcr
 from pytest import fixture
-from fat.client import Rpc
+from fat.client import Fat
 
 
 class TestRpc:
@@ -16,8 +16,8 @@ class TestRpc:
         self.address = "FA3HtmuE9hycaewAcYBuqNucmEihk1VApMCJw6uBRnb1nWeqQw8y"
 
     @fixture
-    def rpc_instance(self):
-        return Rpc("http://localhost:8078/v1")
+    def fat(self):
+        return Fat("http://localhost:8078/v1")
 
     @fixture
     def get_issuance_subkeys(self):
@@ -29,10 +29,10 @@ class TestRpc:
         return ["entryhash", "timestamp", "data"]
 
     @vcr.use_cassette("tests/vcr_cassettes/get_issuance.yaml")
-    def test_get_issuance_by_chain(self, rpc_instance, get_issuance_subkeys):
+    def test_get_issuance_by_chain(self, fat, get_issuance_subkeys):
         """Tests an API call to get a token's issuance."""
 
-        response = rpc_instance.get_issuance(self.chain_id)
+        response = fat.rpc.get_issuance(self.chain_id)
 
         assert isinstance(response, dict)
         assert isinstance(response["result"], dict)
@@ -40,11 +40,11 @@ class TestRpc:
         assert set(get_issuance_subkeys).issubset(response["result"])
 
     @vcr.use_cassette("tests/vcr_cassettes/get_issuance.yaml")
-    def test_get_issuance_by_token(self, rpc_instance, get_issuance_subkeys):
+    def test_get_issuance_by_token(self, fat, get_issuance_subkeys):
         """Tests an API call to get a token's issuance."""
 
-        response = rpc_instance.get_issuance(token_id=self.token_id,
-                                             issuer_id=self.issuer_id)
+        response = fat.rpc.get_issuance(token_id=self.token_id,
+                                        issuer_id=self.issuer_id)
 
         assert isinstance(response, dict)
         assert isinstance(response["result"], dict)
@@ -53,9 +53,9 @@ class TestRpc:
         assert set(get_issuance_subkeys).issubset(response["result"])
 
     @vcr.use_cassette("tests/vcr_cassettes/get_transaction.yaml")
-    def test_get_transaction(self, rpc_instance, get_transaction_subkeys):
+    def test_get_transaction(self, fat, get_transaction_subkeys):
 
-        response = rpc_instance.get_transaction(self.entry_hash, self.chain_id)
+        response = fat.rpc.get_transaction(self.entry_hash, self.chain_id)
 
         assert isinstance(response, dict)
         assert isinstance(response["result"], dict)
@@ -63,13 +63,25 @@ class TestRpc:
         assert set(get_transaction_subkeys).issubset(response["result"])
 
     @vcr.use_cassette("tests/vcr_cassettes/get_transactions.yaml")
-    def test_get_transcations(self, rpc_instance, get_transaction_subkeys):
+    def test_get_transcations(self, fat, get_transaction_subkeys):
         pass
 
     @vcr.use_cassette("tests/vcr_cassettes/get_balance.yaml")
-    def test_get_balance(self, rpc_instance):
+    def test_get_balance(self, fat):
 
-        response = rpc_instance.get_balance(self.address, self.chain_id)
+        response = fat.rpc.get_balance(self.address, self.chain_id)
 
         assert isinstance(response, dict)
         assert response["result"] == 0
+
+
+class TestDaemon:
+    @fixture
+    def fat(self):
+        return Fat("http://localhost:8078/v1")
+
+    @vcr.use_cassette("tests/vcr_cassettes/daemon/get_balance.yaml")
+    def test_get_tokens(self, fat):
+        # response = fat.daemon.get_tokens()
+        # assert False
+        pass
