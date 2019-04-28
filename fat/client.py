@@ -21,12 +21,8 @@ class BaseApi:
 class Fat:
     def __init__(self, url):
         self._api = BaseApi(url)
-        self._daemon = Daemon(api=self.api)
-        self._rpc = Rpc(api=self.api)
-
-    @property
-    def api(self):
-        return self._api
+        self._daemon = Daemon(api=self._api)
+        self._rpc = Rpc(api=self._api)
 
     @property
     def daemon(self):
