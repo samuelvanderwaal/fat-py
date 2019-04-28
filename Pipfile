@@ -1,0 +1,31 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+autopep8 = "*"
+pytest = "*"
+vcrpy = "*"
+
+[packages]
+atomicwrites = "==1.3.0"
+attrs = "==19.1.0"
+certifi = "==2019.3.9"
+chardet = "==3.0.4"
+idna = "==2.8"
+jsonrpc-requests = "==0.4.0"
+more-itertools = "==7.0.0"
+multidict = "==4.5.2"
+pluggy = "==0.9.0"
+py = "==1.8.0"
+requests = "==2.21.0"
+six = "==1.12.0"
+urllib3 = "==1.24.2"
+wrapt = "==1.11.1"
+yarl = "==1.3.0"
+PyYAML = "==5.1"
+
+[requires]
+python_version = "3.7"
