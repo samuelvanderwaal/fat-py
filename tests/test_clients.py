@@ -63,7 +63,7 @@ class TestRpc:
         assert set(get_transaction_subkeys).issubset(response["result"])
 
     @vcr.use_cassette("tests/vcr_cassettes/get_transactions.yaml")
-    def test_get_transcations(self, rpc_instance, get_transaction_subkeys):
+    def test_get_transcations(self, fat, get_transaction_subkeys):
         pass
 
     @vcr.use_cassette("tests/vcr_cassettes/get_balance.yaml")
