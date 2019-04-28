@@ -73,3 +73,15 @@ class TestRpc:
 
         assert isinstance(response, dict)
         assert response["result"] == 0
+
+
+class TestDaemon:
+    @fixture
+    def fat(self):
+        return Fat("http://localhost:8078/v1")
+
+    @vcr.use_cassette("tests/vcr_cassettes/daemon/get_balance.yaml")
+    def test_get_tokens(self, fat):
+        # response = fat.daemon.get_tokens()
+        # assert False
+        pass
