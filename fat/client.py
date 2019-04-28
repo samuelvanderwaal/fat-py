@@ -38,8 +38,8 @@ class Fat:
 
 
 class Rpc:
-    def __init__(self, url):
-        self.url = url
+    def __init__(self, api: BaseApi):
+        self.api = api
 
     @staticmethod
     def check_id_params(chain_id, token_id, issuer_id):
@@ -53,32 +53,20 @@ class Rpc:
 
     def get_issuance(self, chain_id=None, token_id=None, issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
-
-        payload = {"jsonrpc": "2.0", "method": "get-issuance",
-                   "params": params, "id": 1}
-
-        response = session.post(self.url, json=payload)
-        return response.json()
+        return self.api.call(method="get-issuance", params=params)
 
     def get_transaction(self, entry_hash, chain_id=None, token_id=None,
                         issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
         params["entryhash"] = entry_hash
-
-        payload = {"jsonrpc": "2.0", "method": "get-transaction",
-                   "params": params, "id": 1}
-
-        response = session.post(self.url, json=payload)
-
-        return response.json()
+        return self.api.call(method="get-transaction", params=params)
 
     def get_balance(self, address, chain_id=None, token_id=None,
                     issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
         params["address"] = address
+        return self.api.call(method="get-balance", params=params)
 
-        payload = {"jsonrpc": "2.0", "method": "get-balance",
-                   "params": params, "id": 1}
 
 class Daemon:
     def __init__(self, api: BaseApi):
