@@ -7,12 +7,8 @@ class BaseApi:
         self.url = url
 
     def call(self, method, params=None):
-        if (params is not None):
             payload = {"jsonrpc": "2.0", "method": method,
                        "params": params, "id": 1}
-        else:
-            payload = {"jsonrpc": "2.0", "method": method,
-                       "id": 1}
 
         response = session.post(self.url, json=payload)
         return response.json()
