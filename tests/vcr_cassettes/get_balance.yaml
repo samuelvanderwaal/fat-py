@@ -21,18 +21,14 @@ interactions:
     body:
       string: '{"jsonrpc":"2.0","result":50,"id":1}
 
-'
+        '
     headers:
       Content-Length:
       - '37'
       Content-Type:
       - text/plain; charset=utf-8
       Date:
-      - Tue, 14 May 2019 00:49:55 GMT
-      Fatd-Api-Version:
-      - '1'
-      Fatd-Version:
-      - v0.4.2.r38.ge5c9222
+      - Tue, 14 May 2019 08:04:20 GMT
       Vary:
       - Origin
     status:

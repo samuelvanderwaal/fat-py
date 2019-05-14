@@ -21,18 +21,14 @@ interactions:
     body:
       string: '{"jsonrpc":"2.0","result":{"chainid":"145d5207a1ca2978e2a1cb43c97d538cd516d65cd5d14579549664bfecd80296","tokenid":"test","issuerid":"888888a37cbf303c0bfc8d0cc7e77885c42000b757bd4d9e659de994477a0904","entryhash":"1a57257d2cf102f4ea9aca88285ee88596963f099c8077af238fb5edda663c32","timestamp":1557643920,"issuance":{"type":"FAT-0","supply":-1,"symbol":"test"}},"id":1}
 
-'
+        '
     headers:
       Content-Length:
       - '366'
       Content-Type:
       - text/plain; charset=utf-8
       Date:
-      - Tue, 14 May 2019 00:49:55 GMT
-      Fatd-Api-Version:
-      - '1'
-      Fatd-Version:
-      - v0.4.2.r38.ge5c9222
+      - Tue, 14 May 2019 08:04:20 GMT
       Vary:
       - Origin
     status:

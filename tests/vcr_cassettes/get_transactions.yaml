@@ -23,18 +23,14 @@ interactions:
     body:
       string: '{"jsonrpc":"2.0","result":[{"entryhash":"506278a53f299bc9941e7d576e61d6d216864703ef02310434182eb1481030c3","timestamp":1557647100,"data":{"inputs":{"FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC":100},"outputs":{"FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW":100}}},{"entryhash":"92a24761e66f074461489d76b81fa2eb67d1fa2d6051338320ca0653d7fdbbb6","timestamp":1557792360,"data":{"inputs":{"FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW":50},"outputs":{"FA3j68XNwKwvHXV2TKndxPpyCK3KrWTDyyfxzi8LwuM5XRuEmhy6":50}}}],"id":1}
 
-'
+        '
     headers:
       Content-Length:
       - '542'
       Content-Type:
       - text/plain; charset=utf-8
       Date:
-      - Tue, 14 May 2019 00:49:55 GMT
-      Fatd-Api-Version:
-      - '1'
-      Fatd-Version:
-      - v0.4.2.r38.ge5c9222
+      - Tue, 14 May 2019 08:04:20 GMT
       Vary:
       - Origin
     status:
