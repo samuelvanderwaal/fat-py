@@ -1,0 +1,36 @@
+interactions:
+- request:
+    body: '{"jsonrpc": "2.0", "method": "get-sync-status", "id": 1}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.21.0
+    method: POST
+    uri: http://localhost:8078/v1
+  response:
+    body:
+      string: '{"jsonrpc":"2.0","result":{"syncheight":192469,"factomheight":192469},"id":1}
+
+        '
+    headers:
+      Content-Length:
+      - '78'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 14 May 2019 07:23:01 GMT
+      Vary:
+      - Origin
+    status:
+      code: 200
+      message: OK
+version: 1

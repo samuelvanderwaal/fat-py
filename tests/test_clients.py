@@ -114,8 +114,24 @@ class TestDaemon:
     def fat(self):
         return Fat("http://localhost:8078/v1")
 
-    @vcr.use_cassette("tests/vcr_cassettes/daemon/get_balance.yaml")
+    @vcr.use_cassette("tests/vcr_cassettes/daemon/get_tokens.yaml")
     def test_get_tokens(self, fat):
-        # response = fat.daemon.get_tokens()
-        # assert False
-        pass
+        response = fat.daemon.get_tokens()
+        assert isinstance(response["result"], list)
+        assert isinstance(response["result"][0]["chainid"], str)
+        assert isinstance(response["result"][0]["tokenid"], str)
+        assert isinstance(response["result"][0]["issuerid"], str)
+
+    @vcr.use_cassette("tests/vcr_cassettes/daemon/get_properties.yaml")
+    def test_get_properties(self, fat):
+        response = fat.daemon.get_properties()
+        assert isinstance(response["result"], dict)
+        assert isinstance(response["result"]["fatdversion"], str)
+        assert isinstance(response["result"]["apiversion"], str)
+
+    @vcr.use_cassette("tests/vcr_cassettes/daemon/get_sync_status.yaml")
+    def test_get_sync_status(self, fat):
+        response = fat.daemon.get_sync_status()
+        assert isinstance(response["result"], dict)
+        assert isinstance(response["result"]["syncheight"], int)
+        assert isinstance(response["result"]["factomheight"], int)
