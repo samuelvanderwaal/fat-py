@@ -1,7 +1,7 @@
 interactions:
 - request:
-    body: '{"jsonrpc": "2.0", "method": "get-balance", "params": {"chainid": "b54c4310530dc4dd361101644fa55cb10aec561e7874a7b786ea3b66f2c6fdfb",
-      "address": "FA3HtmuE9hycaewAcYBuqNucmEihk1VApMCJw6uBRnb1nWeqQw8y"}, "id": 1}'
+    body: '{"jsonrpc": "2.0", "method": "get-balance", "params": {"chainid": "145d5207a1ca2978e2a1cb43c97d538cd516d65cd5d14579549664bfecd80296",
+      "address": "FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW"}, "id": 1}'
     headers:
       Accept:
       - '*/*'
@@ -19,20 +19,20 @@ interactions:
     uri: http://localhost:8078/v1
   response:
     body:
-      string: '{"jsonrpc":"2.0","result":0,"id":1}
+      string: '{"jsonrpc":"2.0","result":50,"id":1}
 
-        '
+'
     headers:
       Content-Length:
-      - '36'
+      - '37'
       Content-Type:
       - text/plain; charset=utf-8
       Date:
-      - Sat, 27 Apr 2019 22:46:07 GMT
+      - Tue, 14 May 2019 00:49:55 GMT
       Fatd-Api-Version:
       - '1'
       Fatd-Version:
-      - v0.4.2.r9.g8cf68b7
+      - v0.4.2.r38.ge5c9222
       Vary:
       - Origin
     status:

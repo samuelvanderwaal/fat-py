@@ -1,5 +1,5 @@
 from . import session
-from .exceptions import *
+from .exceptions import MissingRequiredParameter
 
 
 class BaseApi:
@@ -7,7 +7,7 @@ class BaseApi:
         self.url = url
 
     def call(self, method, params=None):
-        if (params != None):
+        if (params is not None):
             payload = {"jsonrpc": "2.0", "method": method,
                        "params": params, "id": 1}
         else:
@@ -44,21 +44,24 @@ class Rpc:
         elif token_id and issuer_id:
             return {"tokenid": token_id, "issuerid": issuer_id}
         else:
-            raise MissingRequiredParameter(
-                "Requires either chain_id or token_id AND issuer_id.")
+            raise MissingRequiredParameter("Requires either chain_id or token_id AND issuer_id.")
 
     def get_issuance(self, chain_id=None, token_id=None, issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
         return self.api.call(method="get-issuance", params=params)
 
-    def get_transaction(self, entry_hash, chain_id=None, token_id=None,
-                        issuer_id=None):
+    def get_transaction(self, entry_hash, chain_id=None, token_id=None, issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
         params["entryhash"] = entry_hash
         return self.api.call(method="get-transaction", params=params)
 
-    def get_balance(self, address, chain_id=None, token_id=None,
-                    issuer_id=None):
+    def get_transactions(self, addresses, chain_id=None, token_id=None, issuer_id=None):
+        params = Rpc.check_id_params(chain_id, token_id, issuer_id)
+        params["addresses"] = addresses
+
+        return self.api.call(method="get-transactions", params=params)
+
+    def get_balance(self, address, chain_id=None, token_id=None, issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
         params["address"] = address
         return self.api.call(method="get-balance", params=params)

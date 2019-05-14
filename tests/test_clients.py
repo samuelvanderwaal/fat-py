@@ -6,14 +6,13 @@ from fat.client import Fat
 class TestRpc:
     def setup(self):
         self.chain_id = (
-            "b54c4310530dc4dd361101644fa55cb10aec561e7874a7b786ea3b66f2c6fdfb")
+            "145d5207a1ca2978e2a1cb43c97d538cd516d65cd5d14579549664bfecd80296")
         self.token_id = "test"
         self.issuer_id = (
-            "88888807e4f3bbb9a2b229645ab6d2f184224190f83e78761674c2362aca4425")
+            "888888a37cbf303c0bfc8d0cc7e77885c42000b757bd4d9e659de994477a0904")
         self.entry_hash = (
-            "3b2c34b26365f01d432df762479da91eb995e6791248c98be7f8c202f1c1a28a")
-        # Fund this address with tokens for testing.
-        self.address = "FA3HtmuE9hycaewAcYBuqNucmEihk1VApMCJw6uBRnb1nWeqQw8y"
+            "506278a53f299bc9941e7d576e61d6d216864703ef02310434182eb1481030c3")
+        self.address = "FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW"
 
     @fixture
     def fat(self):
@@ -57,14 +56,34 @@ class TestRpc:
 
         response = fat.rpc.get_transaction(self.entry_hash, self.chain_id)
 
+        result = response["result"]
+        data = result["data"]
+
         assert isinstance(response, dict)
         assert isinstance(response["result"], dict)
-        assert response["result"]["entryhash"] == self.entry_hash
+        assert result["entryhash"] == self.entry_hash
         assert set(get_transaction_subkeys).issubset(response["result"])
+        assert data["inputs"] == {"FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC": 100}
+        assert data["outputs"] == {"FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW": 100}
 
     @vcr.use_cassette("tests/vcr_cassettes/get_transactions.yaml")
-    def test_get_transcations(self, fat, get_transaction_subkeys):
-        pass
+    def test_get_transactions(self, fat, get_transaction_subkeys):
+
+        response = fat.rpc.get_transactions(
+            ["FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW",
+             "FA3j68XNwKwvHXV2TKndxPpyCK3KrWTDyyfxzi8LwuM5XRuEmhy6"], self.chain_id)
+
+        result = response["result"]
+        tx1 = result[0]
+        tx2 = result[1]
+        data1 = tx1["data"]
+        data2 = tx2["data"]
+
+        assert len(result) == 2
+        assert data1["inputs"] == {"FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC": 100}
+        assert data1["outputs"] == {"FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW": 100}
+        assert data2["inputs"] == {"FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW": 50}
+        assert data2["outputs"] == {"FA3j68XNwKwvHXV2TKndxPpyCK3KrWTDyyfxzi8LwuM5XRuEmhy6": 50}
 
     @vcr.use_cassette("tests/vcr_cassettes/get_balance.yaml")
     def test_get_balance(self, fat):
@@ -72,7 +91,22 @@ class TestRpc:
         response = fat.rpc.get_balance(self.address, self.chain_id)
 
         assert isinstance(response, dict)
-        assert response["result"] == 0
+        assert response["result"] == 50
+
+    def test_get_nf_balance(self, fat):
+        pass
+
+    def test_get_stats(self, fat):
+        pass
+
+    def test_get_nf_token(self, fat):
+        pass
+
+    def test_get_nf_tokens(self, fat):
+        pass
+
+    def test_send_transaction(self, fat):
+        pass
 
 
 class TestDaemon:

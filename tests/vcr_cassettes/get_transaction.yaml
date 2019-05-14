@@ -1,7 +1,7 @@
 interactions:
 - request:
-    body: '{"jsonrpc": "2.0", "method": "get-transaction", "params": {"chainid": "b54c4310530dc4dd361101644fa55cb10aec561e7874a7b786ea3b66f2c6fdfb",
-      "entryhash": "3b2c34b26365f01d432df762479da91eb995e6791248c98be7f8c202f1c1a28a"},
+    body: '{"jsonrpc": "2.0", "method": "get-transaction", "params": {"chainid": "145d5207a1ca2978e2a1cb43c97d538cd516d65cd5d14579549664bfecd80296",
+      "entryhash": "506278a53f299bc9941e7d576e61d6d216864703ef02310434182eb1481030c3"},
       "id": 1}'
     headers:
       Accept:
@@ -20,20 +20,20 @@ interactions:
     uri: http://localhost:8078/v1
   response:
     body:
-      string: '{"jsonrpc":"2.0","result":{"entryhash":"3b2c34b26365f01d432df762479da91eb995e6791248c98be7f8c202f1c1a28a","timestamp":1546229040,"data":{"inputs":{"FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC":5000},"outputs":{"FA2kEkNgQ5RMNx5Y14HRQa4X8czeZqg74AJykR8f3jx4Cbk26gcM":5000}}},"id":1}
+      string: '{"jsonrpc":"2.0","result":{"entryhash":"506278a53f299bc9941e7d576e61d6d216864703ef02310434182eb1481030c3","timestamp":1557647100,"data":{"inputs":{"FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC":100},"outputs":{"FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW":100}}},"id":1}
 
-        '
+'
     headers:
       Content-Length:
-      - '290'
+      - '288'
       Content-Type:
       - text/plain; charset=utf-8
       Date:
-      - Sat, 27 Apr 2019 19:57:02 GMT
+      - Tue, 14 May 2019 00:49:55 GMT
       Fatd-Api-Version:
       - '1'
       Fatd-Version:
-      - v0.4.2.r9.g8cf68b7
+      - v0.4.2.r38.ge5c9222
       Vary:
       - Origin
     status:
