@@ -1,0 +1,36 @@
+interactions:
+- request:
+    body: '{"jsonrpc": "2.0", "method": "get-daemon-properties", "id": 1}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '62'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.21.0
+    method: POST
+    uri: http://localhost:8078/v1
+  response:
+    body:
+      string: '{"jsonrpc":"2.0","result":{"fatdversion":"v0.4.2.r0.gb044496","apiversion":"1"},"id":1}
+
+        '
+    headers:
+      Content-Length:
+      - '88'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Tue, 14 May 2019 07:23:01 GMT
+      Vary:
+      - Origin
+    status:
+      code: 200
+      message: OK
+version: 1
