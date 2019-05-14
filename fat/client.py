@@ -2,18 +2,6 @@ from . import session
 from .exceptions import MissingRequiredParameter
 
 
-class BaseApi:
-    def __init__(self, url):
-        self.url = url
-
-    def call(self, method, params=None):
-            payload = {"jsonrpc": "2.0", "method": method,
-                       "params": params, "id": 1}
-
-        response = session.post(self.url, json=payload)
-        return response.json()
-
-
 class Fat:
     def __init__(self, url):
         self._api = BaseApi(url)
@@ -27,6 +15,18 @@ class Fat:
     @property
     def rpc(self):
         return self._rpc
+
+
+class BaseApi:
+    def __init__(self, url):
+        self.url = url
+
+    def call(self, method, params=None):
+        payload = {"jsonrpc": "2.0", "method": method,
+                   "params": params, "id": 1}
+
+        response = session.post(self.url, json=payload)
+        return response.json()
 
 
 class Rpc:
