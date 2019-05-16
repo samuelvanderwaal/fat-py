@@ -51,16 +51,62 @@ class Rpc:
         params["entryhash"] = entry_hash
         return self.api.call(method="get-transaction", params=params)
 
-    def get_transactions(self, addresses, chain_id=None, token_id=None, issuer_id=None):
+    def get_transactions(self, nf_token_id=None, addresses=None, tofrom=None, entry_hash=None,
+                         page=None, limit=None, order=None, chain_id=None, token_id=None,
+                         issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
-        params["addresses"] = addresses
-
+        if nf_token_id:
+            params["nftokenid"] = nf_token_id
+        if addresses:
+            params["addresses"] = addresses
+        if tofrom:
+            params["tofrom"] = tofrom
+        if entry_hash:
+            params["entryhash"] = entry_hash
+        if page:
+            params["page"] = page
+        if limit:
+            params["limit"] = limit
+        if order:
+            params["order"] = order
         return self.api.call(method="get-transactions", params=params)
 
     def get_balance(self, address, chain_id=None, token_id=None, issuer_id=None):
         params = Rpc.check_id_params(chain_id, token_id, issuer_id)
         params["address"] = address
         return self.api.call(method="get-balance", params=params)
+
+    def get_nf_balance(self, address, chain_id=None, token_id=None, issuer_id=None):
+        params = Rpc.check_id_params(chain_id, token_id, issuer_id)
+        params["address"] = address
+        return self.api.call(method="get-nf-balance", params=params)
+
+    def get_nf_token(self, nf_token_id, chain_id=None, token_id=None, issuer_id=None):
+        params = Rpc.check_id_params(chain_id, token_id, issuer_id)
+        params["nftokenid"] = nf_token_id
+        return self.api.call(method="get-nf-token", params=params)
+
+    def get_nf_tokens(self, page=None, limit=None, order=None, chain_id=None,
+                      token_id=None, issuer_id=None):
+        params = Rpc.check_id_params(chain_id, token_id, issuer_id)
+        if page:
+            params["page"] = page
+        if limit:
+            params["limit"] = limit
+        if order:
+            params["order"] = order
+        print(params)
+        return self.api.call(method="get-nf-tokens", params=params)
+
+    def get_stats(self, chain_id=None, token_id=None, issuer_id=None):
+        params = Rpc.check_id_params(chain_id, token_id, issuer_id)
+        return self.api.call(method="get-stats", params=params)
+
+    def send_transaction(self, extids, content, chain_id=None, token_id=None, issuer_id=None):
+        params = Rpc.check_id_params(chain_id, token_id, issuer_id)
+        params["extids"] = extids
+        params["content"] = content
+        return self.api.call(method="send-transaction", params=params)
 
 
 class Daemon:
