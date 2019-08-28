@@ -1,12 +1,22 @@
 from . import session
 from .exceptions import MissingRequiredParameter
+from factom import Factomd, FactomWalletd
 
 
-class Fat:
-    def __init__(self, url):
-        self._api = BaseApi(url)
+class Client:
+    def __init__(
+                self,
+                fatd_host: str = "http://localhost:8078/v1",
+                factomd_host: str = "http://localhost:8088",
+                walletd_host: str = "http://localhost:8089"
+                ):
+        self._api = BaseApi(fatd_host)
         self._daemon = Daemon(api=self._api)
         self._rpc = Rpc(api=self._api)
+        # self._fat0 = Fat0(api=self._api)
+        # self._fat1 = Fat1(api=self._api)
+        self._factomd = Factomd(host=factomd_host)
+        self._walletd = FactomWalletd(host=walletd_host)
 
     @property
     def daemon(self):
@@ -16,10 +26,40 @@ class Fat:
     def rpc(self):
         return self._rpc
 
+    # @property
+    # def fat0(self):
+    #     return self._fat0
+    # @property
+    # def fat1(self):
+    #     return self.fat1
+
+    def initialize_token(self, supply: int, symbol: str = None, metadata=None):
+        pass
+
+    def issue_token(self, inputs: dict, outputs: dict, metadata=None):
+        pass
+
+    def send_transaction(self, inputs: dict, outputs: dict, metadata=None):
+        pass
+
+    def get_fat0_balance(self, address, chain_id=None, token_id=None, issuer_id=None):
+        response = self.rpc.get_balance(address, chain_id, token_id, issuer_id)
+        try:
+            return response["result"]
+        except KeyError:
+            return response["error"]
+
+    def get_fat1_balance(self, address, chain_id=None, token_id=None, issuer_id=None):
+        response = self.rpc.get_nf_balance(address, chain_id, token_id, issuer_id)
+        try:
+            return response["result"]
+        except KeyError:
+            return f"Error: {response['error']}"
+
 
 class BaseApi:
-    def __init__(self, url):
-        self.url = url
+    def __init__(self, fatd_host):
+        self.url = fatd_host
 
     def call(self, method, params=None):
         payload = {"jsonrpc": "2.0", "method": method,
@@ -27,6 +67,25 @@ class BaseApi:
 
         response = session.post(self.url, json=payload)
         return response.json()
+
+
+class Fat0:
+    def __init__(self, api: BaseApi):
+        self.api = api
+
+    @staticmethod
+    def check_id_params(chain_id: str, token_id: str, issuer_id: str):
+        if chain_id:
+            return {"chainid": chain_id}
+        elif token_id and issuer_id:
+            return {"tokenid": token_id, "issuerid": issuer_id}
+        else:
+            raise MissingRequiredParameter("Requires either chain_id or token_id AND issuer_id.")
+
+
+class Fat1:
+    def __init__(self, api: BaseApi):
+        self.api = api
 
 
 class Rpc:

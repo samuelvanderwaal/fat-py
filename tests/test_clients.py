@@ -1,5 +1,5 @@
 from pytest import fixture
-from fat.client import Fat
+from fat.client import Fat0, Rpc, Daemon
 
 
 class TestRpc:
@@ -13,7 +13,7 @@ class TestRpc:
 
     @fixture
     def fat(self):
-        return Fat("http://localhost:8078/v1")
+        return Fat0("http://localhost:8078/v1")
 
     @fixture
     def get_issuance_subkeys(self):
@@ -118,7 +118,7 @@ class TestRpc:
 class TestDaemon:
     @fixture
     def fat(self):
-        return Fat("http://localhost:8078/v1")
+        return Fat0("http://localhost:8078/v1")
 
     def test_get_tokens(self, fat):
         response = fat.daemon.get_tokens()
