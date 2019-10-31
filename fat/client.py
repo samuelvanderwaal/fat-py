@@ -1,12 +1,12 @@
+import sys
 import random
 import string
-from factom_keys.fct import FactoidAddress
-# from factom_keys.serverid import ServerIdPrivateKey, ServerIdPublicKey
 from urllib.parse import urljoin
 from .fat0.transactions import Transaction
-
 from .errors import handle_error_response
 from .session import APISession
+sys.path.insert(0, "/home/samuel/Coding/factom_keys")
+from factom_keys.fct import FactoidAddress
 
 
 class BaseAPI(object):
@@ -52,7 +52,7 @@ class BaseAPI(object):
         if params:
             data["params"] = params
 
-        resp = self.session.request("POST", self.url, json=data)
+        resp = self.session.request("POST", self._url, json=data)
         print(f"Resp status code: {resp.status_code}")
         print(f"Response: {resp.json()}")
         if resp.status_code >= 400:
@@ -82,10 +82,8 @@ class FATd(BaseAPI):
         """
         return self._request("get-balances", {"address": address.to_string()})
 
-    def send_transaction(self, tx: Transaction):
-
-
-        return self._request(
-            "send-transaction",
-            {"chainid": chain_id.hex(), "extids": [x.hex() for x in ext_ids], "content": content.hex()},
-        )
+    # def send_transaction(self, tx: Transaction):
+    #     return self._request(
+    #         "send-transaction",
+    #         {"chainid": chain_id.hex(), "extids": [x.hex() for x in ext_ids], "content": content.hex()},
+    #     )

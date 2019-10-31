@@ -1,41 +1,22 @@
+import sys
 import json
 import hashlib
 from datetime import datetime as dt
-from dataclasses import dataclass
-from dataclasses import field as data_field
+from dataclasses import dataclass, field
 from typing import List, Tuple
+from .errors import InvalidParamError, InvalidChainIDError, InvalidTransactionError
+sys.path.insert(0, '/home/samuel/Coding/factom-keys/')
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
-
-
-class InvalidTransactionError(Exception):
-    pass
-
-
-class MissingRequiredParameter(Exception):
-    def __init__(self):
-        super.__init__(self, "Requires either chain_id or token_id AND issuer_id.")
-
-
-class InvalidChainIDError(ValueError):
-    pass
-
-
-class InvalidParamError(ValueError):
-    pass
-
-
-class InvalidFactoidKey(ValueError):
-    pass
 
 
 @dataclass
 class Transaction:
-    inputs: dict = data_field(default_factory=dict)
-    outputs: dict = data_field(default_factory=dict)
-    metadata: dict = data_field(default_factory=dict)
-    chainid: str = data_field(default_factory=str)
+    inputs: dict = field(default_factory=dict)
+    outputs: dict = field(default_factory=dict)
+    metadata: dict = field(default_factory=dict)
+    chainid: str = field(default_factory=str)
     timestamp: str = str(int(dt.utcnow().timestamp()))
-    _signer_keys: List[FactoidPrivateKey] = data_field(init=False, default_factory=list)
+    _signer_keys: List[FactoidPrivateKey] = field(init=False, default_factory=list)
 
     def add_input(self, address: FactoidAddress, amount: int) -> None:
         if not (isinstance(address, FactoidAddress) and isinstance(amount, int)):
@@ -95,7 +76,7 @@ class Transaction:
 
         return True
 
-    def build_content(self) -> bytes:
+    def build_content(self) -> dict:
         content = {}
 
         content["inputs"] = self.inputs
@@ -117,12 +98,8 @@ class Transaction:
             raise InvalidTransactionError
 
         extids = [self.timestamp.encode()]
-
         content = self.build_content()
-        # print(content.encode().hex())
-
         chainid = bytes.fromhex(self.chainid)
-        # print(content.encode().hex())
 
         for i, signer in enumerate(self._signer_keys):
             # Create message hash
