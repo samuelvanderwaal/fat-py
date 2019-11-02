@@ -52,13 +52,13 @@ class BaseAPI(object):
         if params:
             data["params"] = params
 
-        resp = self.session.request("POST", self._url, json=data)
+        resp = self.session.request("POST", self.url, json=data)
         print(f"Resp status code: {resp.status_code}")
         print(f"Response: {resp.json()}")
         if resp.status_code >= 400:
             handle_error_response(resp)
 
-        return resp.json()["result"]
+        return resp.json()
 
 
 class FATd(BaseAPI):
@@ -82,8 +82,8 @@ class FATd(BaseAPI):
         """
         return self._request("get-balances", {"address": address.to_string()})
 
-    # def send_transaction(self, tx: Transaction):
-    #     return self._request(
-    #         "send-transaction",
-    #         {"chainid": chain_id.hex(), "extids": [x.hex() for x in ext_ids], "content": content.hex()},
-    #     )
+    def send_transaction(self, tx: Transaction):
+        return self._request(
+            "send-transaction",
+            {"chainid": bytes.fromhex(tx.chain_id).hex(), "extids": [x.hex() for x in tx._ext_ids], "content": tx._content.hex()},
+        )

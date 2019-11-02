@@ -3,10 +3,11 @@ import json
 import hashlib
 from datetime import datetime as dt
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from .errors import InvalidParamError, InvalidChainIDError, InvalidTransactionError
 sys.path.insert(0, '/home/samuel/Coding/factom-keys/')
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
+from factom_keys.serverid import ServerIDPrivateKey
 
 
 @dataclass
@@ -14,9 +15,11 @@ class Transaction:
     inputs: dict = field(default_factory=dict)
     outputs: dict = field(default_factory=dict)
     metadata: dict = field(default_factory=dict)
-    chainid: str = field(default_factory=str)
+    chain_id: str = field(default_factory=str)
     timestamp: str = str(int(dt.utcnow().timestamp()))
     _signer_keys: List[FactoidPrivateKey] = field(init=False, default_factory=list)
+    _ext_ids: list = None
+    _content: bytes = None
 
     def add_input(self, address: FactoidAddress, amount: int) -> None:
         if not (isinstance(address, FactoidAddress) and isinstance(amount, int)):
@@ -28,8 +31,8 @@ class Transaction:
             raise InvalidParamError("Incorrect address or amount!")
         self.outputs[address.to_string()] = amount
 
-    def add_signer(self, signer: FactoidPrivateKey) -> None:
-        if not isinstance(signer, FactoidPrivateKey):
+    def add_signer(self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey]) -> None:
+        if not (isinstance(signer, FactoidPrivateKey) or isinstance(signer, ServerIDPrivateKey)):
             raise InvalidParamError("Not a factoid private key!")
 
         self._signer_keys.append(signer)
@@ -37,10 +40,10 @@ class Transaction:
     def set_metadata(self, data: dict) -> None:
         self.metadata = data
 
-    def set_chainid(self, chainid: str) -> None:
-        if not isinstance(chainid, str):
+    def set_chain_id(self, chain_id: str) -> None:
+        if not isinstance(chain_id, str):
             raise InvalidChainIDError
-        self.chainid = chainid
+        self.chain_id = chain_id
 
     def is_valid(self) -> bool:
         """
@@ -49,16 +52,14 @@ class Transaction:
         :return: a bool representing whether the transaction is valid or not.
         """
         # Check that we have a private key for every input.
-        if len(self.inputs) > len(self._signer_keys):
-            return False
-        elif len(self.inputs) < len(self._signer_keys):
+        if not (len(self.inputs) == len(self._signer_keys)):
             return False
 
         # Check that inputs and outputs are not empty.
         if not self.inputs and self.outputs:
             return False
 
-        if not self.chainid:
+        if not self.chain_id:
             return False
 
         # Check that sum of inputs == sum of outputs
@@ -76,6 +77,11 @@ class Transaction:
 
         return True
 
+    def is_mint(self) -> bool:
+        # If only one input and it's the coinbase address
+        return (len(self.inputs) == 1 and
+                "FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC" in self.inputs)
+
     def build_content(self) -> dict:
         content = {}
 
@@ -86,7 +92,7 @@ class Transaction:
             content["metadata"] = self.metadata
 
         # Including separators removes whitespace.
-        return json.dumps(content, separators=(",", ":"))
+        return json.dumps(content, separators=(",", ":")).encode()
 
     def sign(self) -> Tuple[List[bytes], bytes]:
         """
@@ -97,22 +103,26 @@ class Transaction:
         if not self.is_valid():
             raise InvalidTransactionError
 
-        extids = [self.timestamp.encode()]
+        ext_ids = [self.timestamp.encode()]
         content = self.build_content()
-        chainid = bytes.fromhex(self.chainid)
+        chain_id = bytes.fromhex(self.chain_id)
 
         for i, signer in enumerate(self._signer_keys):
             # Create message hash
             message = bytearray()
             message.extend(str(i).encode())
             message.extend(self.timestamp.encode())
-            message.extend(chainid)
-            message.extend(content.encode())
+            message.extend(chain_id)
+            message.extend(content)
             message_hash = hashlib.sha512(message).digest()
 
             # Get and append rcd and signature
-            extids.append(b"\x01" + signer.get_factoid_address().key_bytes)
-            print(b"\x01" + signer.get_factoid_address().key_bytes)
-            extids.append(signer.sign(message_hash))
+            if self.is_mint():
+                print("here")
+                ext_ids.append(b"\x01" + signer.get_public_key().key_bytes)
+            else:
+                ext_ids.append(b"\x01" + signer.get_factoid_address().key_bytes)
+            ext_ids.append(signer.sign(message_hash))
 
-        return (extids, content)
+        self._ext_ids = ext_ids
+        self._content = content
