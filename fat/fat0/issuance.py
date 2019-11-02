@@ -62,7 +62,6 @@ class Issuance:
         if not (supply > 0 or supply == -1):
             raise InvalidParamError("Supply must be greater than 0 or equal to -1!")
         self._supply = supply
-        return True
 
     @property
     def symbol(self):
@@ -76,7 +75,6 @@ class Issuance:
         if not re.fullmatch(r"[A-Z]{1,4}", symbol.upper()):
             raise InvalidParamError("Symbol must be 1-4 characters of the set [A-Z].")
         self._symbol = symbol
-        return True
 
     @property
     def metadata(self):
@@ -87,7 +85,6 @@ class Issuance:
         if not isinstance(metadata, dict):
             raise InvalidParamError
         self._metadata = metadata
-        return True
 
     @property
     def ec_address(self):
@@ -108,7 +105,6 @@ class Issuance:
         if not isinstance(server_priv_key, ServerIDPrivateKey):
             raise InvalidParamError
         self._server_priv_key = server_priv_key
-        return True
 
     @property
     def ec_priv_key(self):
@@ -119,14 +115,10 @@ class Issuance:
         if not isinstance(ec_priv_key, ECPrivateKey):
             raise InvalidParamError
         self._ec_priv_key = ec_priv_key
-        return True
 
     def is_valid(self) -> bool:
-
         # Check that we have all required parameters
-        if not (self._token_id and self._issuer_id and self._supply and self._ec_priv_key and self._server_priv_key):
-            return False
-        return True
+        return (self._token_id and self._issuer_id and self._supply and self._ec_priv_key and self._server_priv_key)
 
     def build_init_content(self) -> bytes:
         content = {}
@@ -149,12 +141,13 @@ class Issuance:
         chain_id = sha256(b''.join([x for x in ext_ids_hash])).digest()
         self.chain_id = chain_id
 
-    def calculate_num_ec(self, content, ext_ids) -> int:
-        # 10 EC for the chain + 1 for each kb of data in the entry
+    @staticmethod
+    def calculate_num_ec(content, ext_ids) -> int:
+        # 1 EC for each 1 kb of data in the entry
         # round up to nearest entry credit
-        content_kb = len(content)/1024
-        ext_ids_kb = len(b"".join(ext_ids))/1024
-        ecs = math.ceil(content_kb + ext_ids_kb)
+        ext_ids_len = sum([len(x) for x in ext_ids])
+        payload_kb = (len(content) + ext_ids_len)/1024
+        ecs = math.ceil(payload_kb)
         return ecs
 
     def create_chain(self, factomd, ext_ids, content, sleep):
@@ -168,7 +161,7 @@ class Issuance:
         commit_weld = sha256(sha256(entry_hash + self.chain_id).digest()).digest()
 
         # Creating a chain is 10 + the amount needed for the entry
-        ec_spent = 10 + self.calculate_num_ec(content, ext_ids)
+        ec_spent = 10 + Issuance.calculate_num_ec(content, ext_ids)
         ec_public_key = self.ec_address.key_bytes
 
         # Convert timestamp to milliseconds and represent by six bytes, MSB to the left.
@@ -191,7 +184,7 @@ class Issuance:
 
     def initialize_token(self, factomd, ext_ids, content, sleep):
         entry = Entry(self.chain_id, ext_ids, content)
-        ec_spent = self.calculate_num_ec(content, ext_ids)
+        ec_spent = Issuance.calculate_num_ec(content, ext_ids)
 
         entry_commit = EntryCommit(
             self.milli_timestamp,
