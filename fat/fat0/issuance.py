@@ -16,8 +16,8 @@ from factom_core.block_elements import ChainCommit, Entry, EntryCommit
 
 
 class Issuance:
-    def __init__(self, token_id=None, issuer_id=None, supply=None, metadata=None, ec_address=None,
-                 server_priv_key=None):
+    def __init__(self, token_id=None, issuer_id=None, supply=None, symbol=None, metadata=None, ec_address=None,
+                 ec_priv_key=None, server_priv_key=None):
         self._timestamp = dt.now(timezone.utc).timestamp()
         if token_id:
             self.token_id = token_id
@@ -25,12 +25,22 @@ class Issuance:
             self.issuer_id = issuer_id
         if supply:
             self.supply = supply
-        if metadata:
-            self.metadata = metadata
         if ec_address:
             self.ec_address = ec_address
+        if ec_priv_key:
+            self.ec_priv_key = ec_priv_key
         if server_priv_key:
             self.server_priv_key = server_priv_key
+
+        # Optional parameters; go around property validation if not set.
+        if symbol:
+            self.symbol = symbol
+        else:
+            self._symbol = symbol
+        if metadata:
+            self.metadata = metadata
+        else:
+            self._metadata = metadata
 
     @property
     def token_id(self):
@@ -252,7 +262,9 @@ class Issuance:
         ext_ids = [b"token", self.token_id.encode(), b"issuer", bytes.fromhex(self.issuer_id)]
         content = "".encode()
 
-        self.create_chain(factomd, content, ext_ids, wait)
+        print("Creating chain. . .")
+        data = self.create_chain(factomd, content, ext_ids, wait)
+        print(data)
 
         time.sleep(3)
 
@@ -272,4 +284,6 @@ class Issuance:
         ext_ids.append(b"\x01" + self._server_priv_key.get_public_key().key_bytes)
         ext_ids.append(self._server_priv_key.sign(message_hash))
 
-        return self.initialize_token(factomd, content, ext_ids, wait)
+        print("Initializing token. . .")
+        resp = self.initialize_token(factomd, content, ext_ids, wait)
+        print(resp)
