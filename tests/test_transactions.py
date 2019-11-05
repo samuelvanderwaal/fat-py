@@ -80,7 +80,7 @@ class TestTransactions:
 
         tx.add_signer(self._private_fct_key1)
         tx.add_signer(self._private_fct_key2)
-        assert len(tx._signer_keys) == 2
+        assert len(tx.signers) == 2
 
         # Missing chain_id
         assert not tx.is_valid()

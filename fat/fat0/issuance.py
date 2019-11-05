@@ -6,7 +6,7 @@ import json
 from hashlib import sha256, sha512
 from typing import List
 from datetime import timezone
-from datetime import datetime as dt
+from datetime import datetime as dt, timezone
 from .errors import InvalidParamError, InvalidTransactionError, MissingRequiredParameter
 sys.path.insert(0, '/home/samuel/Coding/factom-keys/')
 sys.path.insert(0, '/home/samuel/Coding/factom-core')
