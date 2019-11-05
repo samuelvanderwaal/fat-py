@@ -4,8 +4,7 @@ import math
 import time
 import json
 from hashlib import sha256, sha512
-from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List
 from datetime import timezone
 from datetime import datetime as dt
 from .errors import InvalidParamError, InvalidTransactionError, MissingRequiredParameter
@@ -122,9 +121,19 @@ class Issuance:
         self._ec_priv_key = ec_priv_key
 
     def is_valid(self) -> bool:
+        """
+        Determine if instance contains all the required values for signing.
+
+        :return: validity as a bool
+        """
         return (self.token_id and self.issuer_id and self.supply and self.ec_priv_key and self.server_priv_key)
 
     def build_init_content(self) -> bytes:
+        """
+        Build the content for the intialization entry.
+
+        :return: content as bytes
+        """
         content = {}
         content["type"] = "FAT-0"
         content["supply"] = self.supply
@@ -136,7 +145,10 @@ class Issuance:
 
         return json.dumps(content, separators=(",", ":")).encode()
 
-    def create_chain_id(self) -> bytes:
+    def create_chain_id(self):
+        """
+        Create the new chain id from token name and issuer id.
+        """
         if not (self.token_id and self.issuer_id):
             raise MissingRequiredParameter("Missing token_id and/or issuer_id!")
 
@@ -146,7 +158,14 @@ class Issuance:
         self.chain_id = chain_id
 
     @staticmethod
-    def calculate_num_ec(content, ext_ids) -> int:
+    def calculate_num_ec(content: bytes, ext_ids: List[bytes]) -> int:
+        """
+        Calculate the number of entry credits required by the given content and external IDs.
+
+        :param content: the entry content of the entry as bytes.
+        :param ext_ids: the ext_ids of the entry as a list of bytes.
+        :return: the necessary number of entry credits as an int.
+        """
         # 1 EC for each 1 kb of data in the entry
         # round up to nearest entry credit
         ext_ids_len = sum([len(x) for x in ext_ids])
@@ -154,7 +173,15 @@ class Issuance:
         ecs = math.ceil(payload_kb)
         return ecs
 
-    def create_chain(self, factomd, ext_ids, content, sleep):
+    def create_chain(self, factomd, content, ext_ids, wait):
+        """
+        Create a new chain.
+
+        :param factomd: the factomd instance used for submitting API calls on.
+        :param content: the content of the chain/first entry as bytes.
+        :param ext_ids: the ext_ids of the chain/first entry as a list of bytes.
+        :param wait: the wait time between submitting the chain commit and reveal.
+        """
         self.create_chain_id()
         chain_id_hash = sha256(sha256(self.chain_id).digest()).digest()
 
@@ -183,10 +210,18 @@ class Issuance:
         chain_commit.signature = self.ec_priv_key.sign(chain_commit.marshal_for_signature())
         message = chain_commit.marshal()
         factomd.commit_chain(message)
-        time.sleep(sleep)
+        time.sleep(wait)
         return factomd.reveal_chain(entry_bytes)
 
-    def initialize_token(self, factomd, ext_ids, content, sleep):
+    def initialize_token(self, factomd, content, ext_ids, wait):
+        """
+        Create intialization entry for token.
+
+        :param factomd: the factomd instance used for submitting API calls on.
+        :param content: the content of the initialization entry as bytes.
+        :param ext_ids: the ext_ids of the initialization entry as a list of bytes.
+        :param wait: the wait time between submitting the entry commit and reveal.
+        """
         entry = Entry(self.chain_id, ext_ids, content)
         ec_spent = Issuance.calculate_num_ec(content, ext_ids)
 
@@ -200,22 +235,28 @@ class Issuance:
         entry_commit.signature = self.ec_priv_key.sign(entry_commit.marshal_for_signature())
         message = entry_commit.marshal()
         factomd.commit_entry(message)
-        time.sleep(sleep)
+        time.sleep(wait)
         return factomd.reveal_entry(entry.marshal())
 
-    def issue_token(self, factomd, sleep: float = 2.0):
+    def issue_token(self, factomd, wait: float = 2.0):
+        """
+        Issue a new token using values in class instance.
+
+        :param factomd: the factomd instance used for submitting API calls on.
+        :param wait: the wait time between creating the chain and submitting the first entry.
+        """
         if not self.is_valid():
             raise InvalidTransactionError
 
+        # Prepare chain values and create a new chain.
         ext_ids = [b"token", self.token_id.encode(), b"issuer", bytes.fromhex(self.issuer_id)]
-        # content = self.build_init_content()
         content = "".encode()
 
-        self.create_chain(factomd, ext_ids, content, sleep)
+        self.create_chain(factomd, content, ext_ids, wait)
 
         time.sleep(3)
 
-        # Initialization
+        # Prepare token initialization entry and create entry.
         content = self.build_init_content()
 
         # Create message hash
@@ -231,4 +272,4 @@ class Issuance:
         ext_ids.append(b"\x01" + self._server_priv_key.get_public_key().key_bytes)
         ext_ids.append(self._server_priv_key.sign(message_hash))
 
-        return self.initialize_token(factomd, ext_ids, content, sleep)
+        return self.initialize_token(factomd, content, ext_ids, wait)
