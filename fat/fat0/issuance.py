@@ -16,17 +16,22 @@ from factom_keys.ec import ECAddress, ECPrivateKey
 from factom_core.block_elements import ChainCommit, Entry, EntryCommit
 
 
-@dataclass
 class Issuance:
-    _token_id: str = ""
-    _issuer_id: str = ""
-    _supply: int = 0
-    _symbol: str = ""
-    _metadata: dict = field(default_factory=dict)
-    _ec_address: ECAddress = field(default_factory=str)
-    _ec_priv_key: ECPrivateKey = field(default_factory=str)
-    _server_priv_key: ServerIDPrivateKey = field(default_factory=str)
-    _timestamp: float = dt.now(timezone.utc).timestamp()
+    def __init__(self, token_id=None, issuer_id=None, supply=None, metadata=None, ec_address=None,
+                 server_priv_key=None):
+        self._timestamp = dt.now(timezone.utc).timestamp()
+        if token_id:
+            self.token_id = token_id
+        if issuer_id:
+            self.issuer_id = issuer_id
+        if supply:
+            self.supply = supply
+        if metadata:
+            self.metadata = metadata
+        if ec_address:
+            self.ec_address = ec_address
+        if server_priv_key:
+            self.server_priv_key = server_priv_key
 
     @property
     def token_id(self):
@@ -117,8 +122,7 @@ class Issuance:
         self._ec_priv_key = ec_priv_key
 
     def is_valid(self) -> bool:
-        # Check that we have all required parameters
-        return (self._token_id and self._issuer_id and self._supply and self._ec_priv_key and self._server_priv_key)
+        return (self.token_id and self.issuer_id and self.supply and self.ec_priv_key and self.server_priv_key)
 
     def build_init_content(self) -> bytes:
         content = {}
