@@ -90,7 +90,7 @@ class TestTransactions:
 
     def test_transaction_signing_single_input(self, tx1, tx1_extids):
         # Override timestamp to match historical transactions
-        tx1.timestamp = "1571180727"
+        tx1._timestamp = "1571180727"
 
         tx1.sign()
 
@@ -104,7 +104,7 @@ class TestTransactions:
 
     def test_transaction_signing_multiple_input(self, tx2, tx2_extids):
         # Override timestamp to match historical transactions
-        tx2.timestamp = "1571166720"
+        tx2._timestamp = "1571166720"
 
         tx2.sign()
 

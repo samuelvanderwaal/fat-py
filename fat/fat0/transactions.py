@@ -4,7 +4,8 @@ import hashlib
 from datetime import datetime as dt, timezone as tz
 from typing import List, Tuple, Union
 from .errors import InvalidParamError, InvalidChainIDError, InvalidTransactionError
-sys.path.insert(0, '/home/samuel/Coding/factom-keys/')
+
+sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
 from factom_keys.serverid import ServerIDPrivateKey
 
@@ -34,20 +35,24 @@ class Transaction:
             for s in signers:
                 self.add_signer(s)
 
-    def add_input(self, address: FactoidAddress, amount: int) -> None:
-        if not (isinstance(address, FactoidAddress) and isinstance(amount, int)):
-            raise InvalidParamError("Incorrect address or amount!")
-        self.inputs[address.to_string()] = amount
+    def add_input(self, address: Union[FactoidAddress, str], amount: int) -> None:
+        address = Transaction.validate_address(address)
 
-    def add_output(self, address: FactoidAddress, amount: int) -> None:
-        if not (isinstance(address, FactoidAddress) and isinstance(amount, int)):
+        if not isinstance(amount, int):
             raise InvalidParamError("Incorrect address or amount!")
-        self.outputs[address.to_string()] = amount
 
-    def add_signer(self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey]) -> None:
-        if not (isinstance(signer, FactoidPrivateKey) or isinstance(signer, ServerIDPrivateKey)):
-            raise InvalidParamError("Not a factoid private key!")
-        self.signers.append(signer)
+        self.inputs[address] = amount
+
+    def add_output(self, address: Union[FactoidAddress, str], amount: int) -> None:
+        address = Transaction.validate_address(address)
+
+        if not isinstance(amount, int):
+            raise InvalidParamError("Incorrect address or amount!")
+
+        self.outputs[address] = amount
+
+    def add_signer(self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]) -> None:
+        self.signers.append(self.validate_signer(signer))
 
     def set_metadata(self, data: dict) -> None:
         self.metadata = data
@@ -56,6 +61,35 @@ class Transaction:
         if not isinstance(chain_id, str):
             raise InvalidChainIDError
         self.chain_id = chain_id
+
+    @staticmethod
+    def validate_address(address: Union[FactoidAddress, str]) -> str:
+        if isinstance(address, FactoidAddress):
+            address = address.to_string()
+        elif isinstance(address, str):
+            address = FactoidAddress(key_string=address).to_string()
+        else:
+            raise InvalidParamError("Invalid address!")
+        return address
+
+    def validate_signer(
+        self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]
+    ) -> Union[FactoidPrivateKey, ServerIDPrivateKey]:
+        if self.is_mint():
+            if isinstance(signer, str):
+                signer = ServerIDPrivateKey(signer)
+            elif isinstance(signer, ServerIDPrivateKey):
+                pass
+            else:
+                raise InvalidParamError("Invalid signer key for transaction type!")
+        else:
+            if isinstance(signer, str):
+                signer = FactoidPrivateKey(signer)
+            elif isinstance(signer, FactoidPrivateKey):
+                pass
+            else:
+                raise InvalidParamError("Invalid signer key for transaction type!")
+        return signer
 
     def is_valid(self) -> bool:
         """
@@ -91,8 +125,7 @@ class Transaction:
 
     def is_mint(self) -> bool:
         # If only one input and it is the coinbase address
-        return (len(self.inputs) == 1 and
-                "FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC" in self.inputs)
+        return len(self.inputs) == 1 and "FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC" in self.inputs
 
     def build_content(self) -> dict:
         content = {}
