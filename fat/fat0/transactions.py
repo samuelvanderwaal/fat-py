@@ -67,7 +67,7 @@ class Transaction:
         if isinstance(address, FactoidAddress):
             address = address.to_string()
         elif isinstance(address, str):
-            address = FactoidAddress(key_string=address).to_string()
+            address = FactoidAddress(address_string=address).to_string()
         else:
             raise InvalidParamError("Invalid address!")
         return address

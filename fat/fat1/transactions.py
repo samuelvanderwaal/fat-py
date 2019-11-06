@@ -35,19 +35,17 @@ class Transaction:
             for s in signers:
                 self.add_signer(s)
 
-    def add_input(self, address: Union[FactoidAddress, str], amount: int) -> None:
+    def add_input(self, address: Union[FactoidAddress, str], amount: list) -> None:
         address = Transaction.validate_address(address)
 
-        if not isinstance(amount, int):
-            raise InvalidParamError("Incorrect address or amount!")
+        self.validate_amount(amount)
 
         self.inputs[address] = amount
 
-    def add_output(self, address: Union[FactoidAddress, str], amount: int) -> None:
+    def add_output(self, address: Union[FactoidAddress, str], amount: list) -> None:
         address = Transaction.validate_address(address)
 
-        if not isinstance(amount, int):
-            raise InvalidParamError("Incorrect address or amount!")
+        self.validate_amount(amount)
 
         self.outputs[address] = amount
 
@@ -67,10 +65,19 @@ class Transaction:
         if isinstance(address, FactoidAddress):
             address = address.to_string()
         elif isinstance(address, str):
-            address = FactoidAddress(key_string=address).to_string()
+            address = FactoidAddress(address_string=address).to_string()
         else:
             raise InvalidParamError("Invalid address!")
         return address
+
+    @staticmethod
+    def validate_amount(amount: list):
+        if not isinstance(amount, list):
+            raise InvalidParamError("Invalid amount!")
+
+        for entry in amount:
+            if not (isinstance(entry, dict) or isinstance(entry, int)):
+                raise InvalidParamError("Invalid amount!")
 
     def validate_signer(
         self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]
@@ -106,19 +113,6 @@ class Transaction:
             return False
 
         if not self.chain_id:
-            return False
-
-        # Check that sum of inputs == sum of outputs
-        inputs_sum = 0
-        outputs_sum = 0
-
-        for _, value in self.inputs.items():
-            inputs_sum += value
-
-        for _, value in self.outputs.items():
-            outputs_sum += value
-
-        if not inputs_sum == outputs_sum:
             return False
 
         return True
