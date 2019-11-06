@@ -5,7 +5,8 @@ from fat.fat0.issuance import Issuance
 from fat.fat0.errors import InvalidParamError
 from factom_keys.ec import ECAddress, ECPrivateKey
 sys.path.insert(0, '/home/samuel/Coding/factom-keys')
-from factom_keys.serverid import ServerIDPrivateKey
+from factom_keys.serverid import ServerIDPrivateKey, BadKeyStringError as BadKeyID
+from factom_keys.ec import BadKeyStringError as BadKeyEC
 
 
 class TestIssuance:
@@ -143,15 +144,20 @@ class TestIssuance:
     def test_issuance_set_server_priv_key(self):
         issuance = Issuance()
 
-        # Not a ServerIDPrivateKey
+        # Not a ServerIDPrivateKey or str
         with raises(InvalidParamError):
             issuance.server_priv_key = 1110
 
         with raises(InvalidParamError):
             issuance.server_priv_key = b"1010101"
 
-        with raises(InvalidParamError):
+        with raises(BadKeyID):
             issuance.server_priv_key = "not a ServerID key"
+
+        server_priv_key = "sk11pz4AG9XgB1eNVkbppYAWsgyg7sftDXqBASsagKJqvVRKYodCU"
+        issuance.server_priv_key = server_priv_key
+        assert isinstance(issuance.server_priv_key, ServerIDPrivateKey)
+        assert issuance.server_priv_key.to_string() == "sk11pz4AG9XgB1eNVkbppYAWsgyg7sftDXqBASsagKJqvVRKYodCU"
 
         server_priv_key = ServerIDPrivateKey(key_string="sk11pz4AG9XgB1eNVkbppYAWsgyg7sftDXqBASsagKJqvVRKYodCU")
         issuance.server_priv_key = server_priv_key
@@ -167,7 +173,7 @@ class TestIssuance:
         with raises(InvalidParamError):
             issuance.ec_priv_key = b"1010101"
 
-        with raises(InvalidParamError):
+        with raises(BadKeyEC):
             issuance.ec_priv_key = "not a ServerID key"
 
         ec_priv_key = ECPrivateKey(key_string="Es3w7m5KkGs97595YEiYouyjaJcsouHQr7cCLUrqKt6Y8LvWurAP")

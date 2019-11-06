@@ -106,7 +106,11 @@ class Issuance:
 
     @ec_address.setter
     def ec_address(self, ec_address):
-        if not isinstance(ec_address, ECAddress):
+        if isinstance(ec_address, str):
+            ec_address = ECAddress(key_string=ec_address)
+        elif isinstance(ec_address, ECAddress):
+            pass
+        else:
             raise InvalidParamError
         self._ec_address = ec_address
 
@@ -116,7 +120,11 @@ class Issuance:
 
     @server_priv_key.setter
     def server_priv_key(self, server_priv_key):
-        if not isinstance(server_priv_key, ServerIDPrivateKey):
+        if isinstance(server_priv_key, str):
+            server_priv_key = ServerIDPrivateKey(key_string=server_priv_key)
+        elif isinstance(server_priv_key, ServerIDPrivateKey):
+            pass
+        else:
             raise InvalidParamError
         self._server_priv_key = server_priv_key
 
@@ -126,7 +134,11 @@ class Issuance:
 
     @ec_priv_key.setter
     def ec_priv_key(self, ec_priv_key):
-        if not isinstance(ec_priv_key, ECPrivateKey):
+        if isinstance(ec_priv_key, str):
+            ec_priv_key = ECPrivateKey(key_string=ec_priv_key)
+        elif isinstance(ec_priv_key, ECPrivateKey):
+            pass
+        else:
             raise InvalidParamError
         self._ec_priv_key = ec_priv_key
 
