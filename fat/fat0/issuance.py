@@ -5,8 +5,7 @@ import time
 import json
 from hashlib import sha256, sha512
 from typing import List
-from datetime import timezone
-from datetime import datetime as dt, timezone
+from datetime import datetime as dt, timezone as tz
 from .errors import InvalidParamError, InvalidTransactionError, MissingRequiredParameter
 sys.path.insert(0, '/home/samuel/Coding/factom-keys/')
 sys.path.insert(0, '/home/samuel/Coding/factom-core')
@@ -18,7 +17,7 @@ from factom_core.block_elements import ChainCommit, Entry, EntryCommit
 class Issuance:
     def __init__(self, token_id=None, issuer_id=None, supply=None, symbol=None, metadata=None, ec_address=None,
                  ec_priv_key=None, server_priv_key=None):
-        self._timestamp = dt.now(timezone.utc).timestamp()
+        self._timestamp = dt.now(tz.utc).timestamp()
         if token_id:
             self.token_id = token_id
         if issuer_id:
