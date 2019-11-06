@@ -50,6 +50,7 @@ class Issuance:
         if not isinstance(token_id, str):
             raise InvalidParamError("Token ID must be a string!")
         self._token_id = token_id
+        return self
 
     @property
     def issuer_id(self):
@@ -63,6 +64,7 @@ class Issuance:
         if not (len(issuer_id) == 64 and issuer_id[0:6] == "888888"):
             raise InvalidParamError("Not a valid issuer ID!")
         self._issuer_id = issuer_id
+        return self
 
     @property
     def supply(self):
@@ -75,6 +77,7 @@ class Issuance:
         if not (supply > 0 or supply == -1):
             raise InvalidParamError("Supply must be greater than 0 or equal to -1!")
         self._supply = supply
+        return self
 
     @property
     def symbol(self):
@@ -88,6 +91,7 @@ class Issuance:
         if not re.fullmatch(r"[A-Z]{1,4}", symbol.upper()):
             raise InvalidParamError("Symbol must be 1-4 characters of the set [A-Z].")
         self._symbol = symbol
+        return self
 
     @property
     def metadata(self):
@@ -98,6 +102,7 @@ class Issuance:
         if not isinstance(metadata, dict):
             raise InvalidParamError
         self._metadata = metadata
+        return self
 
     @property
     def ec_address(self):
@@ -112,6 +117,7 @@ class Issuance:
         else:
             raise InvalidParamError
         self._ec_address = ec_address
+        return self
 
     @property
     def server_priv_key(self):
@@ -126,6 +132,7 @@ class Issuance:
         else:
             raise InvalidParamError
         self._server_priv_key = server_priv_key
+        return self
 
     @property
     def ec_priv_key(self):
@@ -140,6 +147,7 @@ class Issuance:
         else:
             raise InvalidParamError
         self._ec_priv_key = ec_priv_key
+        return self
 
     def is_valid(self) -> bool:
         """

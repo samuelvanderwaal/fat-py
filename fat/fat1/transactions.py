@@ -4,7 +4,6 @@ import hashlib
 from datetime import datetime as dt, timezone as tz
 from typing import List, Tuple, Union
 from .errors import InvalidParamError, InvalidChainIDError, InvalidTransactionError
-
 sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
 from factom_keys.serverid import ServerIDPrivateKey
@@ -37,28 +36,29 @@ class Transaction:
 
     def add_input(self, address: Union[FactoidAddress, str], amount: list) -> None:
         address = Transaction.validate_address(address)
-
         self.validate_amount(amount)
-
         self.inputs[address] = amount
+        return self
 
     def add_output(self, address: Union[FactoidAddress, str], amount: list) -> None:
         address = Transaction.validate_address(address)
-
         self.validate_amount(amount)
-
         self.outputs[address] = amount
+        return self
 
     def add_signer(self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]) -> None:
         self.signers.append(self.validate_signer(signer))
+        return self
 
     def set_metadata(self, data: dict) -> None:
         self.metadata = data
+        return self
 
     def set_chain_id(self, chain_id: str) -> None:
         if not isinstance(chain_id, str):
             raise InvalidChainIDError
         self.chain_id = chain_id
+        return self
 
     @staticmethod
     def validate_address(address: Union[FactoidAddress, str]) -> str:

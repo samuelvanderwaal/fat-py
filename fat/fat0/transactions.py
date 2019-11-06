@@ -42,6 +42,7 @@ class Transaction:
             raise InvalidParamError("Incorrect address or amount!")
 
         self.inputs[address] = amount
+        return self
 
     def add_output(self, address: Union[FactoidAddress, str], amount: int) -> None:
         address = Transaction.validate_address(address)
@@ -50,17 +51,21 @@ class Transaction:
             raise InvalidParamError("Incorrect address or amount!")
 
         self.outputs[address] = amount
+        return self
 
     def add_signer(self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]) -> None:
         self.signers.append(self.validate_signer(signer))
+        return self
 
     def set_metadata(self, data: dict) -> None:
         self.metadata = data
+        return self
 
     def set_chain_id(self, chain_id: str) -> None:
         if not isinstance(chain_id, str):
             raise InvalidChainIDError
         self.chain_id = chain_id
+        return self
 
     @staticmethod
     def validate_address(address: Union[FactoidAddress, str]) -> str:
