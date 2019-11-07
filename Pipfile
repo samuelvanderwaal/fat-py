@@ -7,7 +7,8 @@ verify_ssl = true
 pylint = "*"
 autopep8 = "*"
 pytest = "*"
-vcrpy = "*"
+pytest-cov = "*"
+pluggy = "*"
 
 [packages]
 atomicwrites = "==1.3.0"
@@ -18,7 +19,6 @@ idna = "==2.8"
 jsonrpc-requests = "==0.4.0"
 more-itertools = "==7.0.0"
 multidict = "==4.5.2"
-pluggy = "==0.9.0"
 py = "==1.8.0"
 requests = "==2.21.0"
 six = "==1.12.0"
@@ -27,6 +27,7 @@ wrapt = "==1.11.1"
 yarl = "==1.3.0"
 PyYAML = "==5.1"
 factom-api = "*"
+pytest-cov = "==2.5"
 
 [requires]
 python_version = "3.7"
