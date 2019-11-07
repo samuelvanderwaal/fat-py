@@ -1,8 +1,8 @@
 import sys
 from base64 import b64decode
 from pytest import fixture, raises
-from fat.fat0.issuance import Issuance
-from fat.fat0.errors import InvalidParamError
+from fat.fat1.issuance import Issuance
+from fat.fat1.errors import InvalidParamError
 from factom_keys.ec import ECAddress, ECPrivateKey
 sys.path.insert(0, '/home/samuel/Coding/factom-keys')
 from factom_keys.serverid import ServerIDPrivateKey, BadKeyStringError as BadKeyID
@@ -11,13 +11,13 @@ from factom_keys.ec import BadKeyStringError as BadKeyEC
 
 class TestIssuance:
     @classmethod
-    def setup(cls):
+    def setup(self):
         # These are throwaway private keys.
-        cls.chain_id = "145d5207a1ca2978e2a1cb43c97d538cd516d65cd5d14579549664bfecd80296"
-        cls.issuer_id = "8888883beff463483a56398545cd02832c74bcdd9c468d61a79d6928f6208291"
-        cls.issuer_signer = ServerIDPrivateKey(key_string="sk12hDMpMzcm9XEdvcy77XwxYU57hpLoCMY1kHtKnyjdGWUpsAvXD")
-        cls.ec_address = ECAddress(key_string="EC3cQ1QnsE5rKWR1B5mzVHdTkAReK5kJwaQn5meXzU9wANyk7Aej")
-        cls.ec_priv_key = ECPrivateKey(key_string="Es3w7m5KkGs97595YEiYouyjaJcsouHQr7cCLUrqKt6Y8LvWurAP")
+        self.chain_id = "145d5207a1ca2978e2a1cb43c97d538cd516d65cd5d14579549664bfecd80296"
+        self.issuer_id = "8888883beff463483a56398545cd02832c74bcdd9c468d61a79d6928f6208291"
+        self.issuer_signer = ServerIDPrivateKey(key_string="sk12hDMpMzcm9XEdvcy77XwxYU57hpLoCMY1kHtKnyjdGWUpsAvXD")
+        self.ec_address = ECAddress(key_string="EC3cQ1QnsE5rKWR1B5mzVHdTkAReK5kJwaQn5meXzU9wANyk7Aej")
+        self.ec_priv_key = ECPrivateKey(key_string="Es3w7m5KkGs97595YEiYouyjaJcsouHQr7cCLUrqKt6Y8LvWurAP")
 
     @fixture
     def issuance(self) -> Issuance:
@@ -49,6 +49,22 @@ class TestIssuance:
             "Lqbjm0YRj/Xb9/WhBLjKtrzRFqmbIZsm06nCvuXjKTnAcpvoy0/3GWs25co7mYLlC9GWncjAf2erTIb5czpHCQ=="
         )
         return ["1557643031", rcd0, signature0]
+
+    def test_issuance_set_token_id(self):
+        """
+        Validate setting token id.
+        """
+        issuance = Issuance()
+
+        # Not a str
+        with raises(InvalidParamError):
+            issuance.token_id = 100
+
+        with raises(InvalidParamError):
+            issuance.token_id = {"not": "a token id"}
+
+        issuance.token_id = "BestToken"
+        assert issuance.token_id == "BestToken"
 
     def test_issuance_set_issuer_id(self):
         """
@@ -199,3 +215,24 @@ class TestIssuance:
         content = b"f"*1024*10
         ext_ids = b""
         assert Issuance.calculate_num_ec(content, ext_ids) == 10
+
+    def test_issuance_constructor_init(self):
+        issuance = Issuance(
+            token_id="token",
+            issuer_id=self.issuer_id,
+            supply=-1,
+            symbol="TKN",
+            metadata={"note": "have some metadata"},
+            ec_address=self.ec_address,
+            ec_priv_key=self.ec_priv_key,
+            server_priv_key=self.issuer_signer
+        )
+
+        assert issuance.token_id == "token"
+        assert issuance.issuer_id == self.issuer_id
+        assert issuance.supply == -1
+        assert issuance.symbol == "TKN"
+        assert issuance.metadata == {"note": "have some metadata"}
+        assert issuance.ec_address == self.ec_address
+        assert issuance.ec_priv_key == self.ec_priv_key
+        assert issuance.server_priv_key == self.issuer_signer

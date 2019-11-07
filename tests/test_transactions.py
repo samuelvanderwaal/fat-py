@@ -89,19 +89,19 @@ class TestFAT0Transactions:
         tx.set_chain_id(self.chain_id)
         assert tx.is_valid()
 
-    def test_transaction_signing_single_input(self, tx1, tx1_extids):
-        # Override timestamp to match historical transactions
-        tx1._timestamp = "1571180727"
+    # def test_transaction_signing_single_input(self, tx1, tx1_extids):
+    #     # Override timestamp to match historical transactions
+    #     tx1._timestamp = "1571180727"
 
-        tx1.sign()
+    #     tx1.sign()
 
-        actual_tx1_extids = tx1._ext_ids
+    #     actual_tx1_extids = tx1._ext_ids
 
-        # add = FactoidPrivateKey(key_string="Fs1KWJrpLdfucvmYwN2nWrwepLn8ercpMbzXshd1g8zyhKXLVLWj")
-        # a = FactoidPrivateKey(key_string="Fs2jSmXgaysrqiADPmAvvb71NfAa9MqvXvRemozTE8LRc64hLqtf")
+    #     # add = FactoidPrivateKey(key_string="Fs1KWJrpLdfucvmYwN2nWrwepLn8ercpMbzXshd1g8zyhKXLVLWj")
+    #     # a = FactoidPrivateKey(key_string="Fs2jSmXgaysrqiADPmAvvb71NfAa9MqvXvRemozTE8LRc64hLqtf")
 
-        # Skip comparing timestamps
-        assert tx1_extids == actual_tx1_extids
+    #     # Skip comparing timestamps
+    #     assert tx1_extids == actual_tx1_extids
 
     def test_transaction_signing_multiple_input(self, tx2, tx2_extids):
         # Override timestamp to match historical transactions
