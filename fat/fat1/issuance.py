@@ -7,16 +7,26 @@ from hashlib import sha256, sha512
 from typing import List
 from datetime import datetime as dt, timezone as tz
 from .errors import InvalidParamError, InvalidTransactionError, MissingRequiredParameter
-sys.path.insert(0, '/home/samuel/Coding/factom-keys/')
-sys.path.insert(0, '/home/samuel/Coding/factom-core')
+
+sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
+sys.path.insert(0, "/home/samuel/Coding/factom-core")
 from factom_keys.serverid import ServerIDPrivateKey
 from factom_keys.ec import ECAddress, ECPrivateKey
 from factom_core.block_elements import ChainCommit, Entry, EntryCommit
 
 
 class Issuance:
-    def __init__(self, token_id=None, issuer_id=None, supply=None, symbol=None, metadata=None, ec_address=None,
-                 ec_priv_key=None, server_priv_key=None):
+    def __init__(
+        self,
+        token_id=None,
+        issuer_id=None,
+        supply=None,
+        symbol=None,
+        metadata=None,
+        ec_address=None,
+        ec_priv_key=None,
+        server_priv_key=None,
+    ):
         self._timestamp = dt.now(tz.utc).timestamp()
         if token_id:
             self.token_id = token_id
@@ -155,7 +165,8 @@ class Issuance:
 
         :return: validity as a bool
         """
-        return (self.token_id and self.issuer_id and self.supply and self.ec_priv_key and self.server_priv_key)
+
+        return self.token_id and self.issuer_id and self.supply and self.ec_priv_key and self.server_priv_key
 
     def build_init_content(self) -> bytes:
         """
@@ -163,6 +174,7 @@ class Issuance:
 
         :return: content as bytes
         """
+
         content = {}
         content["type"] = "FAT-1"
         content["supply"] = self.supply
@@ -178,12 +190,13 @@ class Issuance:
         """
         Create the new chain id from token name and issuer id.
         """
+
         if not (self.token_id and self.issuer_id):
             raise MissingRequiredParameter("Missing token_id and/or issuer_id!")
 
         ext_ids = [b"token", self.token_id.encode(), b"issuer", bytes.fromhex(self.issuer_id)]
         ext_ids_hash = [sha256(x).digest() for x in ext_ids]
-        chain_id = sha256(b''.join([x for x in ext_ids_hash])).digest()
+        chain_id = sha256(b"".join([x for x in ext_ids_hash])).digest()
         self.chain_id = chain_id
 
     @staticmethod
@@ -195,10 +208,10 @@ class Issuance:
         :param ext_ids: the ext_ids of the entry as a list of bytes.
         :return: the necessary number of entry credits as an int.
         """
-        # 1 EC for each 1 kb of data in the entry
-        # round up to nearest entry credit
+
+        # 1 EC for each 1 kb of data in the entry; round up to nearest entry credit.
         ext_ids_len = sum([len(x) for x in ext_ids])
-        payload_kb = (len(content) + ext_ids_len)/1024
+        payload_kb = (len(content) + ext_ids_len) / 1024
         ecs = math.ceil(payload_kb)
         return ecs
 
@@ -211,6 +224,7 @@ class Issuance:
         :param ext_ids: the ext_ids of the chain/first entry as a list of bytes.
         :param wait: the wait time between submitting the chain commit and reveal.
         """
+
         self.create_chain_id()
         chain_id_hash = sha256(sha256(self.chain_id).digest()).digest()
 
@@ -228,12 +242,7 @@ class Issuance:
         self.milli_timestamp = int(self._timestamp * 1000).to_bytes(6, "big")
 
         chain_commit = ChainCommit(
-            self.milli_timestamp,
-            chain_id_hash,
-            commit_weld,
-            entry_hash,
-            ec_spent,
-            ec_public_key
+            self.milli_timestamp, chain_id_hash, commit_weld, entry_hash, ec_spent, ec_public_key
         )
 
         chain_commit.signature = self.ec_priv_key.sign(chain_commit.marshal_for_signature())
@@ -251,15 +260,11 @@ class Issuance:
         :param ext_ids: the ext_ids of the initialization entry as a list of bytes.
         :param wait: the wait time between submitting the entry commit and reveal.
         """
+
         entry = Entry(self.chain_id, ext_ids, content)
         ec_spent = Issuance.calculate_num_ec(content, ext_ids)
 
-        entry_commit = EntryCommit(
-            self.milli_timestamp,
-            entry.entry_hash,
-            ec_spent,
-            self.ec_address.key_bytes
-        )
+        entry_commit = EntryCommit(self.milli_timestamp, entry.entry_hash, ec_spent, self.ec_address.key_bytes)
 
         entry_commit.signature = self.ec_priv_key.sign(entry_commit.marshal_for_signature())
         message = entry_commit.marshal()
@@ -274,6 +279,7 @@ class Issuance:
         :param factomd: the factomd instance used for submitting API calls on.
         :param wait: the wait time between creating the chain and submitting the first entry.
         """
+
         if not self.is_valid():
             raise InvalidTransactionError
 

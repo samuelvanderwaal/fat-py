@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 from .fat0.transactions import Transaction
 from .errors import handle_error_response
 from .session import APISession
+
 sys.path.insert(0, "/home/samuel/Coding/factom_keys")
 from factom_keys.fct import FactoidAddress
 
@@ -85,5 +86,9 @@ class FATd(BaseAPI):
     def send_transaction(self, tx: Transaction):
         return self._request(
             "send-transaction",
-            {"chainid": bytes.fromhex(tx.chain_id).hex(), "extids": [x.hex() for x in tx._ext_ids], "content": tx._content.hex()},
+            {
+                "chainid": bytes.fromhex(tx.chain_id).hex(),
+                "extids": [x.hex() for x in tx._ext_ids],
+                "content": tx._content.hex(),
+            },
         )

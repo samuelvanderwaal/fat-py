@@ -4,6 +4,7 @@ import hashlib
 from datetime import datetime as dt, timezone as tz
 from typing import List, Tuple, Union
 from .errors import InvalidParamError, InvalidChainIDError, InvalidTransactionError
+
 sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
 from factom_keys.serverid import ServerIDPrivateKey
@@ -35,26 +36,58 @@ class Transaction:
                 self.add_signer(s)
 
     def add_input(self, address: Union[FactoidAddress, str], amount: list) -> None:
+        """
+        Create an input entry from an address and amount.
+
+        :param address: the factoid input address as a str or FactoidAddress object
+        :param amount: the factoid input amount as a n int
+        """
+
         address = Transaction.validate_address(address)
         self.validate_amount(amount)
         self.inputs[address] = amount
         return self
 
     def add_output(self, address: Union[FactoidAddress, str], amount: list) -> None:
+        """
+        Create an output entry from an address and amount.
+
+        :param address: the factoid output address as a str or FactoidAddress object
+        :param amount: the factoid output amount as a n int
+        """
+
         address = Transaction.validate_address(address)
         self.validate_amount(amount)
         self.outputs[address] = amount
         return self
 
     def add_signer(self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]) -> None:
+        """
+        Add a signing key to the transaction.
+
+        :param signer: the private key for an input Factoid address or the private key for the issuing ID
+        """
+
         self.signers.append(self.validate_signer(signer))
         return self
 
     def set_metadata(self, data: dict) -> None:
+        """
+        Set a metadata value for the transaction.
+
+        :param data: the metadata value as a Python dict
+        """
+
         self.metadata = data
         return self
 
     def set_chain_id(self, chain_id: str) -> None:
+        """
+        Set the chain id for the transaction.
+
+        :param chain_id: the chain id to submit the transaction entry on as a str
+        """
+
         if not isinstance(chain_id, str):
             raise InvalidChainIDError
         self.chain_id = chain_id
@@ -62,6 +95,12 @@ class Transaction:
 
     @staticmethod
     def validate_address(address: Union[FactoidAddress, str]) -> str:
+        """
+        Validate a Factoid address and convert to a str.
+
+        :param address: a Factoid address as a str or a FactoidAddress object
+        """
+
         if isinstance(address, FactoidAddress):
             address = address.to_string()
         elif isinstance(address, str):
@@ -82,6 +121,12 @@ class Transaction:
     def validate_signer(
         self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]
     ) -> Union[FactoidPrivateKey, ServerIDPrivateKey]:
+        """
+        Validate a privatekey and convert it to a str.
+
+        :param signer: a signing key as a FactoidPrivateKey, ServerIDPrivateKey or a str
+        """
+
         if self.is_mint():
             if isinstance(signer, str):
                 signer = ServerIDPrivateKey(signer)
@@ -104,6 +149,7 @@ class Transaction:
 
         :return: a bool representing whether the transaction is valid or not.
         """
+
         # Check that we have a private key for every input.
         if not (len(self.inputs) == len(self.signers)):
             return False
@@ -118,10 +164,21 @@ class Transaction:
         return True
 
     def is_mint(self) -> bool:
+        """
+        Check if transaction mints new coins from coinbase.
+        :return: a bool representing whether the transaction is a mint type or not.
+        """
+
         # If only one input and it is the coinbase address
         return len(self.inputs) == 1 and "FA1zT4aFpEvcnPqPCigB3fvGu4Q4mTXY22iiuV69DqE1pNhdF2MC" in self.inputs
 
     def build_content(self) -> dict:
+        """
+        Build entry content.
+
+        :return: entry content as bytes.
+        """
+
         content = {}
 
         content["inputs"] = self.inputs
@@ -135,10 +192,11 @@ class Transaction:
 
     def sign(self) -> Tuple[List[bytes], bytes]:
         """
-        Sign all transaction.
+        Sign transaction and create ext_ids and content.
 
         :return: a tuple of the extids and the content: ([extids], content)
         """
+
         if not self.is_valid():
             raise InvalidTransactionError
 
