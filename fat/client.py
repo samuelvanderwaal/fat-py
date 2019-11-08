@@ -1,9 +1,10 @@
 import sys
 import random
 import string
+from typing import Union
 from urllib.parse import urljoin
 from .fat0.transactions import Transaction
-from .errors import handle_error_response
+from .errors import handle_error_response, InvalidParams, MissingRequiredParameter
 from .session import APISession
 
 sys.path.insert(0, "/home/samuel/Coding/factom_keys")
@@ -67,23 +68,101 @@ class FATd(BaseAPI):
         tmp_host = host if host is not None else "http://localhost:8078"
         super().__init__(ec_address, fct_address, tmp_host, username, password, certfile)
 
-    def get_sync_status(self):
-        """Retrieve the current sync status of the node."""
-        return self._request("get-sync-status")
+    # RPC methods
+    def get_issuance(self, chain_id=None, token_id=None, issuer_id=None):
+        """Get the issuance entry for a token."""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        return self._request("get-issuance", params)
+
+    def get_transaction(self, entry_hash, chain_id=None, token_id=None, issuer_id=None):
+        """Get a valid FAT transaction for a token."""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        params["entryhash"] = entry_hash
+        return self._request("get-transaction", params)
+
+    def get_transactions(self, chain_id=None, token_id=None, issuer_id=None, nf_token_id=None, addresses=None,
+                         to_from=None, entry_hash=None, page=None, limit=None, order=None):
+        """
+        Get time ordered valid FAT transactions for a token, or token address, non-fungible token ID,
+        or a combination.
+        """
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        param_list = ["nf_token_id", "addresses", "to_from", "entry_hash", "page", "limit", "order"]
+
+        # Check all params provided to the function against the param_list and if present,
+        # add them to the params dict.
+        for arg, value in locals().copy().items():
+            if arg in param_list and arg is not None:
+                params[arg] = value
+
+        return self._request("get-transactions", params)
+
+    def get_balance(self, address, chain_id=None, token_id=None, issuer_id=None):
+        """Get the balance of an address for a token."""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        params["address"] = address
+        return self._request("get-balance", params)
+
+    def get_nf_balance(self, address, chain_id=None, token_id=None, issuer_id=None):
+        """Get the tokens belonging to an address on a non-fungible token."""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        params["address"] = address
+        return self._request("get-nf-balance", params)
+
+    def get_stats(self, chain_id=None, token_id=None, issuer_id=None):
+        """Get overall statistics for a token."""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        return self._request("get-stats", params)
+
+    def get_nf_token(self, nf_token_id, chain_id=None, token_id=None, issuer_id=None):
+        """Get a non fungible token by ID. The token belong to non fungible token class."""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        params["nftokenid"] = nf_token_id
+        return self._request("get-nf-token", params)
+
+    def get_nf_tokens(self, chain_id=None, token_id=None, issuer_id=None, page=None, limit=None, order=None):
+        """List all issued non fungible tokens in circulation"""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        param_list = ["page", "limit", "order"]
+
+        # Check all params provided to the function against the param_list and if present,
+        # add them to the params dict.
+        for arg, value in locals().copy().items():
+            if arg in param_list and arg is not None:
+                params[arg] = value
+        return self._request("get-nf-tokens", params)
+
+    def send_transaction(self, ext_ids, content, chain_id=None, token_id=None, issuer_id=None):
+        """Send A FAT transaction to a token."""
+        params = FATd.check_id_params(chain_id, token_id, issuer_id)
+        params["extids"] = ext_ids
+        params["content"] = content
+        return self._request("send-transaction", params)
+
+    # Daemon methods
+    def get_daemon_tokens(self):
+        """Get the list of FAT tokens the daemon is currently tracking."""
+        return self._request("get-daemon-tokens")
 
     def get_daemon_properties(self):
         return self._request("get-daemon-properties")
 
-    def get_balances(self, address: FactoidAddress):
+    def get_sync_status(self):
+        """Retrieve the current sync status of the node."""
+        return self._request("get-sync-status")
+
+    def get_balances(self, address: Union[FactoidAddress, str]):
         """
         Get all balances for all tracked tokens of a public Factoid address.
 
         :param address: a public Factoid Address of type factom-keys.FactoidAddress
         :return: JSON response from fatd request "get-balances"
         """
-        return self._request("get-balances", {"address": address.to_string()})
+        address = FATd.validate_address(address)
+        return self._request("get-balances", {"address": address})
 
-    def send_transaction(self, tx: Transaction):
+    def submit_transaction(self, tx: Transaction):
+        """Convenience function that sends a Transaction object through the "send-transaction" RPC call."""
         return self._request(
             "send-transaction",
             {
@@ -92,3 +171,28 @@ class FATd(BaseAPI):
                 "content": tx._content.hex(),
             },
         )
+
+    @staticmethod
+    def validate_address(address: Union[FactoidAddress, str]) -> str:
+        """
+        Validate a Factoid address and convert to a str.
+
+        :param address: a Factoid address as a str or a FactoidAddress object
+        """
+
+        if isinstance(address, FactoidAddress):
+            address = address.to_string()
+        elif isinstance(address, str):
+            address = FactoidAddress(address_string=address).to_string()
+        else:
+            raise InvalidParams("Invalid address!")
+        return address
+
+    @staticmethod
+    def check_id_params(chain_id, token_id, issuer_id):
+        if chain_id:
+            return {"chainid": chain_id}
+        elif token_id and issuer_id:
+            return {"tokenid": token_id, "issuerid": issuer_id}
+        else:
+            raise MissingRequiredParameter("Requires either chain_id or token_id AND issuer_id.")
