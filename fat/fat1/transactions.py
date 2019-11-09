@@ -3,7 +3,7 @@ import json
 import hashlib
 from datetime import datetime as dt, timezone as tz
 from typing import List, Tuple, Union
-from .errors import InvalidParamError, InvalidChainIDError, InvalidTransactionError
+from fat.errors import InvalidParam, InvalidChainID, InvalidTransaction
 
 sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
@@ -106,17 +106,17 @@ class Transaction:
         elif isinstance(address, str):
             address = FactoidAddress(address_string=address).to_string()
         else:
-            raise InvalidParamError("Invalid address!")
+            raise InvalidParam("Invalid address!")
         return address
 
     @staticmethod
     def validate_amount(amount: list):
         if not isinstance(amount, list):
-            raise InvalidParamError("Invalid amount!")
+            raise InvalidParam("Invalid amount!")
 
         for entry in amount:
             if not (isinstance(entry, dict) or isinstance(entry, int)):
-                raise InvalidParamError("Invalid amount!")
+                raise InvalidParam("Invalid amount!")
 
     def validate_signer(
         self, signer: Union[FactoidPrivateKey, ServerIDPrivateKey, str]
@@ -133,14 +133,14 @@ class Transaction:
             elif isinstance(signer, ServerIDPrivateKey):
                 pass
             else:
-                raise InvalidParamError("Invalid signer key for transaction type!")
+                raise InvalidParam("Invalid signer key for transaction type!")
         else:
             if isinstance(signer, str):
                 signer = FactoidPrivateKey(signer)
             elif isinstance(signer, FactoidPrivateKey):
                 pass
             else:
-                raise InvalidParamError("Invalid signer key for transaction type!")
+                raise InvalidParam("Invalid signer key for transaction type!")
         return signer
 
     def is_valid(self) -> bool:

@@ -3,7 +3,7 @@ import json
 import hashlib
 from datetime import datetime as dt, timezone as tz
 from typing import List, Tuple, Union
-from .errors import InvalidParamError, InvalidChainIDError, InvalidTransactionError
+from fat.errors import InvalidParam, InvalidChainID, InvalidTransaction
 
 sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
@@ -46,7 +46,7 @@ class Transaction:
         address = Transaction.validate_address(address)
 
         if not isinstance(amount, int):
-            raise InvalidParamError("Incorrect address or amount!")
+            raise InvalidParam("Incorrect address or amount!")
 
         self.inputs[address] = amount
         return self
@@ -62,7 +62,7 @@ class Transaction:
         address = Transaction.validate_address(address)
 
         if not isinstance(amount, int):
-            raise InvalidParamError("Incorrect address or amount!")
+            raise InvalidParam("Incorrect address or amount!")
 
         self.outputs[address] = amount
         return self
@@ -112,7 +112,7 @@ class Transaction:
         elif isinstance(address, str):
             address = FactoidAddress(address_string=address).to_string()
         else:
-            raise InvalidParamError("Invalid address!")
+            raise InvalidParam("Invalid address!")
         return address
 
     def validate_signer(
@@ -130,14 +130,14 @@ class Transaction:
             elif isinstance(signer, ServerIDPrivateKey):
                 pass
             else:
-                raise InvalidParamError("Invalid signer key for transaction type!")
+                raise InvalidParam("Invalid signer key for transaction type!")
         else:
             if isinstance(signer, str):
                 signer = FactoidPrivateKey(signer)
             elif isinstance(signer, FactoidPrivateKey):
                 pass
             else:
-                raise InvalidParamError("Invalid signer key for transaction type!")
+                raise InvalidParam("Invalid signer key for transaction type!")
         return signer
 
     def is_valid(self) -> bool:

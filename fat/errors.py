@@ -3,7 +3,7 @@ def handle_error_response(resp):
         -1: FATdAPIError,
         -32600: InvalidRequest,
         -32601: MethodNotFound,
-        -32602: InvalidParams,
+        -32602: InvalidParam,
         -32603: InternalError,
         -32700: ParseError,
         -32800: TokenNotFound,
@@ -57,10 +57,6 @@ class MethodNotFound(FATdAPIError):
     pass
 
 
-class InvalidParams(FATdAPIError):
-    pass
-
-
 class InternalError(FATdAPIError):
     pass
 
@@ -90,4 +86,16 @@ class InvalidTransaction(FATdAPIError):
 
 
 class TokenSyncing(FATdAPIError):
+    pass
+
+
+class InvalidFactoidKey(ValueError):
+    pass
+
+
+class InvalidChainID(ValueError):
+    pass
+
+
+class InvalidParam(ValueError):
     pass

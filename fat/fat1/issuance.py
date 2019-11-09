@@ -6,7 +6,7 @@ import json
 from hashlib import sha256, sha512
 from typing import List
 from datetime import datetime as dt, timezone as tz
-from .errors import InvalidParamError, InvalidTransactionError, MissingRequiredParameter
+from fat.errors import InvalidParam, InvalidTransaction, MissingRequiredParameter
 
 sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
 sys.path.insert(0, "/home/samuel/Coding/factom-core")
@@ -58,7 +58,7 @@ class Issuance:
     @token_id.setter
     def token_id(self, token_id):
         if not isinstance(token_id, str):
-            raise InvalidParamError("Token ID must be a string!")
+            raise InvalidParam("Token ID must be a string!")
         self._token_id = token_id
         return self
 
@@ -69,10 +69,10 @@ class Issuance:
     @issuer_id.setter
     def issuer_id(self, issuer_id):
         if not isinstance(issuer_id, str):
-            raise InvalidParamError("Issuer ID must be a string!")
+            raise InvalidParam("Issuer ID must be a string!")
         # Validate issuer id format
         if not (len(issuer_id) == 64 and issuer_id[0:6] == "888888"):
-            raise InvalidParamError("Not a valid issuer ID!")
+            raise InvalidParam("Not a valid issuer ID!")
         self._issuer_id = issuer_id
         return self
 
@@ -83,9 +83,9 @@ class Issuance:
     @supply.setter
     def supply(self, supply):
         if not isinstance(supply, int):
-            raise InvalidParamError("Supply must be type int!")
+            raise InvalidParam("Supply must be type int!")
         if not (supply > 0 or supply == -1):
-            raise InvalidParamError("Supply must be greater than 0 or equal to -1!")
+            raise InvalidParam("Supply must be greater than 0 or equal to -1!")
         self._supply = supply
         return self
 
@@ -96,10 +96,10 @@ class Issuance:
     @symbol.setter
     def symbol(self, symbol: str) -> bool:
         if not isinstance(symbol, str):
-            raise InvalidParamError("Symbol must be type str!")
+            raise InvalidParam("Symbol must be type str!")
         # Regex check for characters A-Z and 1-4 in length.
         if not re.fullmatch(r"[A-Z]{1,4}", symbol.upper()):
-            raise InvalidParamError("Symbol must be 1-4 characters of the set [A-Z].")
+            raise InvalidParam("Symbol must be 1-4 characters of the set [A-Z].")
         self._symbol = symbol
         return self
 
@@ -110,7 +110,7 @@ class Issuance:
     @metadata.setter
     def metadata(self, metadata):
         if not isinstance(metadata, dict):
-            raise InvalidParamError
+            raise InvalidParam
         self._metadata = metadata
         return self
 
@@ -125,7 +125,7 @@ class Issuance:
         elif isinstance(ec_address, ECAddress):
             pass
         else:
-            raise InvalidParamError
+            raise InvalidParam
         self._ec_address = ec_address
         return self
 
@@ -140,7 +140,7 @@ class Issuance:
         elif isinstance(server_priv_key, ServerIDPrivateKey):
             pass
         else:
-            raise InvalidParamError
+            raise InvalidParam
         self._server_priv_key = server_priv_key
         return self
 
@@ -155,7 +155,7 @@ class Issuance:
         elif isinstance(ec_priv_key, ECPrivateKey):
             pass
         else:
-            raise InvalidParamError
+            raise InvalidParam
         self._ec_priv_key = ec_priv_key
         return self
 

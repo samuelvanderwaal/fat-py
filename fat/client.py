@@ -4,7 +4,7 @@ import string
 from typing import Union
 from urllib.parse import urljoin
 from .fat0.transactions import Transaction
-from .errors import handle_error_response, InvalidParams, MissingRequiredParameter
+from .errors import handle_error_response, InvalidParam, MissingRequiredParameter
 from .session import APISession
 
 sys.path.insert(0, "/home/samuel/Coding/factom_keys")
@@ -185,7 +185,7 @@ class FATd(BaseAPI):
         elif isinstance(address, str):
             address = FactoidAddress(address_string=address).to_string()
         else:
-            raise InvalidParams("Invalid address!")
+            raise InvalidParam("Invalid address!")
         return address
 
     @staticmethod

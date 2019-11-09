@@ -2,7 +2,7 @@ import sys
 from base64 import b64decode
 from pytest import fixture, raises
 from fat.fat0.issuance import Issuance
-from fat.fat0.errors import InvalidParamError
+from fat.errors import InvalidParam
 from factom_keys.ec import ECAddress, ECPrivateKey
 sys.path.insert(0, '/home/samuel/Coding/factom-keys')
 from factom_keys.serverid import ServerIDPrivateKey, BadKeyStringError as BadKeyID
@@ -57,10 +57,10 @@ class TestIssuance:
         issuance = Issuance()
 
         # Not a str
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.token_id = 100
 
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.token_id = {"not": "a token id"}
 
         issuance.token_id = "BestToken"
@@ -73,11 +73,11 @@ class TestIssuance:
         issuance = Issuance()
 
         # Not a string
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.symbol = 100
 
         # Not a valid ID
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.symbol = "188888412343124123412341234"
 
         issuance.issuer_id = "888888a37cbf303c0bfc8d0cc7e77885c42000b757bd4d9e659de994477a0904"
@@ -90,15 +90,15 @@ class TestIssuance:
         issuance = Issuance()
 
         # Type str is invalid.
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.supply = "100"
 
         # Negative integers other than -1 are invalid.
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.supply = -2
 
         # Zero is invalid
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.supply = 0
 
         # Check some valid values.
@@ -116,15 +116,15 @@ class TestIssuance:
         issuance = Issuance()
 
         # Not a string
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.symbol = 100
 
         # Too long
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.symbol = "too long"
 
         # Too short
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.symbol = ""
 
         # Just right
@@ -144,10 +144,10 @@ class TestIssuance:
         issuance = Issuance()
 
         # Not a dict
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.metadata = 0
 
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.metadata = "not a dict"
 
         issuance.metadata = {}
@@ -161,10 +161,10 @@ class TestIssuance:
         issuance = Issuance()
 
         # Not a ServerIDPrivateKey or str
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.server_priv_key = 1110
 
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.server_priv_key = b"1010101"
 
         with raises(BadKeyID):
@@ -183,10 +183,10 @@ class TestIssuance:
         issuance = Issuance()
 
         # Not a ECPrivateKey
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.ec_priv_key = 1110
 
-        with raises(InvalidParamError):
+        with raises(InvalidParam):
             issuance.ec_priv_key = b"1010101"
 
         with raises(BadKeyEC):
