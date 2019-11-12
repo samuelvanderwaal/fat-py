@@ -36,7 +36,7 @@ from factom import Factomd
 factomd = Factomd()
 
 issuance = Issuance(
-	token_id="mytoken",
+    token_id="mytoken",
     issuer_id="8888...",
     supply=-1,
     symbol="tkn1",
@@ -134,7 +134,7 @@ issuance.issue_token(factomd)
 
 ```
 
-Issuance supports both strings and key objects from the `factom_keys` library for EC and server ID keys. When strings are passed to it, internally it uses the `factom_keys` library to validate the key and address values. 
+Issuance supports both the Python native `str` type and key objects from the `factom_keys` library for EC and server ID keys. When strings are passed to it, internally it uses the `factom_keys` library to validate the key and address values. 
 
 ```python
 ...
@@ -199,6 +199,28 @@ tx1 = Transaction()
     .sign()
 )
 ```
+
+Transaction supports both the native Python `str` type and key objects from the `factom_keys` library for Factoid private keys, Factoid addresses and for server ID private keys.
+
+```Python
+...
+from factom_keys.ec import FactoidAddress, FactoidPrivateKey
+from factom_keys.serverid import ServerIDPrivateKey
+
+address1 = FactoidAddress(address_string="FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW")
+address2 = "FA2gCmih3PaSYRVMt1jLkdG4Xpo2koebUpQ6FpRRnqw5FfTSN2vW"
+fct_priv_key1 = FactoidPrivateKey(key_string="Fs...")
+fct_priv_key2 = "Fs..."
+
+tx = Transaction()
+tx.add_input(address1, 50)
+tx.add_signer(fct_priv_key1)
+# or
+tx.add_input(address2, 50)
+tx.add_signer(fct_priv_key2)
+```
+
+
 
 Once a transaction has been built and signed, it can be passed to the `submit_transaction()` method on FATd for submission to the blockchain. 
 
