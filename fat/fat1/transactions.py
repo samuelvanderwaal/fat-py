@@ -1,11 +1,8 @@
-import sys
 import json
 import hashlib
 from datetime import datetime as dt, timezone as tz
 from typing import List, Tuple, Union
 from fat.errors import InvalidParam, InvalidChainID, InvalidTransaction
-
-sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
 from factom_keys.fct import FactoidPrivateKey, FactoidAddress
 from factom_keys.serverid import ServerIDPrivateKey
 
@@ -89,7 +86,7 @@ class Transaction:
         """
 
         if not isinstance(chain_id, str):
-            raise InvalidChainIDError
+            raise InvalidChainID
         self.chain_id = chain_id
         return self
 
@@ -198,7 +195,7 @@ class Transaction:
         """
 
         if not self.is_valid():
-            raise InvalidTransactionError
+            raise InvalidTransaction
 
         ext_ids = [self._timestamp.encode()]
         content = self.build_content()

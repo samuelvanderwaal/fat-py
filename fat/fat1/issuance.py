@@ -1,4 +1,3 @@
-import sys
 import re
 import math
 import time
@@ -7,9 +6,6 @@ from hashlib import sha256, sha512
 from typing import List
 from datetime import datetime as dt, timezone as tz
 from fat.errors import InvalidParam, InvalidTransaction, MissingRequiredParameter
-
-sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
-sys.path.insert(0, "/home/samuel/Coding/factom-core")
 from factom_keys.serverid import ServerIDPrivateKey
 from factom_keys.ec import ECAddress, ECPrivateKey
 from factom_core.block_elements import ChainCommit, Entry, EntryCommit
@@ -281,7 +277,7 @@ class Issuance:
         """
 
         if not self.is_valid():
-            raise InvalidTransactionError
+            raise InvalidTransaction
 
         # Prepare chain values and create a new chain.
         ext_ids = [b"token", self.token_id.encode(), b"issuer", bytes.fromhex(self.issuer_id)]

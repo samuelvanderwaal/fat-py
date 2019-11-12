@@ -1,4 +1,3 @@
-import sys
 import re
 import math
 import time
@@ -7,9 +6,6 @@ from hashlib import sha256, sha512
 from typing import List
 from datetime import datetime as dt, timezone as tz
 from fat.errors import InvalidParam, MissingRequiredParameter
-
-sys.path.insert(0, "/home/samuel/Coding/factom-keys/")
-sys.path.insert(0, "/home/samuel/Coding/factom-core")
 from factom_keys.serverid import ServerIDPrivateKey
 from factom_keys.ec import ECAddress, ECPrivateKey
 from factom_core.block_elements import ChainCommit, Entry, EntryCommit

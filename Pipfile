@@ -28,6 +28,8 @@ yarl = "==1.3.0"
 PyYAML = "==5.1"
 factom-api = "*"
 pytest-cov = "==2.5"
+factom-keys = "*"
+factom-core = "*"
 
 [requires]
 python_version = "3.7"
