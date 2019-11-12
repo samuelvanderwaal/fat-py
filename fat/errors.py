@@ -45,10 +45,6 @@ class FATdAPIError(Exception):
         return self.message
 
 
-class MissingRequiredParameter(Exception):
-    pass
-
-
 class InvalidRequest(FATdAPIError):
     pass
 
@@ -98,4 +94,8 @@ class InvalidChainID(ValueError):
 
 
 class InvalidParam(ValueError):
+    pass
+
+
+class MissingRequiredParameter(Exception):
     pass

@@ -87,13 +87,17 @@ class FATd(BaseAPI):
         or a combination.
         """
         params = FATd.check_id_params(chain_id, token_id, issuer_id)
-        param_list = ["nf_token_id", "addresses", "to_from", "entry_hash", "page", "limit", "order"]
+        param_list = {"nf_token_id": "nftokenid", "addresses": "addresses", "to_from": "tofrom",
+                      "entry_hash": "entryhash", "page": "page", "limit": "limit",
+                      "order": "order"
+                      }
 
         # Check all params provided to the function against the param_list and if present,
         # add them to the params dict.
         for arg, value in locals().copy().items():
-            if arg in param_list and arg is not None:
-                params[arg] = value
+            if arg in param_list and value is not None:
+                param = param_list[arg]
+                params[param] = value
 
         return self._request("get-transactions", params)
 
@@ -128,8 +132,9 @@ class FATd(BaseAPI):
         # Check all params provided to the function against the param_list and if present,
         # add them to the params dict.
         for arg, value in locals().copy().items():
-            if arg in param_list and arg is not None:
+            if arg in param_list and value is not None:
                 params[arg] = value
+        print(f"params: {params}")
         return self._request("get-nf-tokens", params)
 
     def send_transaction(self, ext_ids, content, chain_id=None, token_id=None, issuer_id=None):
