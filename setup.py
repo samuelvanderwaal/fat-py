@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fat",
-    version="0.1.0",
+    version="0.1.1",
     author="Samuel Vanderwaal",
     author_email="samuel.vanderwaal@gmail.com",
     description="A Python client library for the FAT protocol.",
@@ -18,4 +18,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    install_requires=["factom-keys", "factom-core", "urllib3", "requests"]
 )
