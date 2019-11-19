@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fat",
-    version="0.0.1",
+    version="0.1.0",
     author="Samuel Vanderwaal",
     author_email="samuel.vanderwaal@gmail.com",
     description="A Python client library for the FAT protocol.",
