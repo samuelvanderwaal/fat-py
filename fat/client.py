@@ -1,4 +1,3 @@
-import sys
 import random
 import string
 from typing import Union
@@ -6,8 +5,6 @@ from urllib.parse import urljoin
 from .fat0.transactions import Transaction
 from .errors import handle_error_response, InvalidParam, MissingRequiredParameter
 from .session import APISession
-
-sys.path.insert(0, "/home/samuel/Coding/factom_keys")
 from factom_keys.fct import FactoidAddress
 
 

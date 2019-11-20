@@ -7,8 +7,8 @@ verify_ssl = true
 pylint = "*"
 autopep8 = "*"
 pytest = "*"
-pytest-cov = "*"
 pluggy = "*"
+pytest-cov = "*"
 
 [packages]
 atomicwrites = "==1.3.0"
@@ -27,7 +27,6 @@ wrapt = "==1.11.1"
 yarl = "==1.3.0"
 PyYAML = "==5.1"
 factom-api = "*"
-pytest-cov = "==2.5"
 factom-keys = "*"
 factom-core = "*"
 
